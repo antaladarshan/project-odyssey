@@ -110,16 +110,28 @@ export const amenities = [
 
 export const neighborhoodHighlights = [
   {
+    name: "Narendra Modi Stadium",
+    distance: "15 min drive",
+    type: "attraction",
+    description: "World's largest cricket stadium — catch a match or take a stadium tour.",
+  },
+  {
+    name: "Metro Station",
+    distance: "10 min walk",
+    type: "transport",
+    description: "Direct metro access to the rest of Ahmedabad — no auto required.",
+  },
+  {
     name: "SG Highway",
     distance: "5 min drive",
-    type: "transport",
+    type: "neighbourhood",
     description: "Ahmedabad's main commercial spine — malls, food, everything.",
   },
   {
     name: "Jodhpur Cross Roads",
     distance: "2 min walk",
-    type: "neighbourhood",
-    description: "Local cafes, chai stalls, and everyday essentials.",
+    type: "food",
+    description: "Local cafes, chai stalls, and everyday essentials right outside.",
   },
   {
     name: "ISKCON Temple",
@@ -128,22 +140,10 @@ export const neighborhoodHighlights = [
     description: "One of the largest ISKCON temples in India.",
   },
   {
-    name: "Alpha One Mall",
-    distance: "12 min drive",
-    type: "food",
-    description: "Food court, cinema, and shopping under one roof.",
-  },
-  {
     name: "Sabarmati Riverfront",
     distance: "20 min drive",
     type: "attraction",
     description: "Evening walks, street food, and city sunsets.",
-  },
-  {
-    name: "Ahmedabad Railway Station",
-    distance: "15 min drive",
-    type: "transport",
-    description: "Direct trains to Mumbai, Delhi, Jaipur.",
   },
 ];
 
