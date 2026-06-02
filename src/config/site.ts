@@ -5,8 +5,8 @@ export const siteConfig = {
     "A boutique backpacker stay in the heart of Pune — three private rooms, one whole flat, and a community of fellow travelers. Book directly and save.",
   url: "https://projectodyssey.in",
   ogImage: "/brand/og-image.jpg",
-  whatsapp: "+919999999999", // TODO: replace with real WhatsApp number
-  email: "stay@projectodyssey.in", // TODO: replace with real email
+  whatsapp: "+918511671066",
+  email: "projectodyssey.in@gmail.com",
   address: {
     street: "TODO: Street Address",
     city: "Pune",
@@ -17,8 +17,7 @@ export const siteConfig = {
     lng: 73.8567,
   },
   socials: {
-    instagram: "https://instagram.com/projectodyssey.in",
-    // TODO: add actual social handles
+    instagram: "https://www.instagram.com/projectodyssey.in/",
   },
   checkIn: "11:00 AM",
   checkOut: "10:00 AM",
