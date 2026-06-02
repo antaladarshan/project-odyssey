@@ -10,7 +10,7 @@ const typeIcons: Record<string, React.ReactNode> = {
 };
 
 export default function PortsOfCall() {
-  const mapEmbedUrl = `https://maps.google.com/maps?q=${property.lat},${property.lng}&z=15&output=embed`;
+  const mapEmbedUrl = `https://maps.google.com/maps?q=Aishwarya+Apartments+Jodhpur+Village+Ahmedabad+Gujarat+380015&z=15&output=embed`;
 
   return (
     <section id="neighborhood" className="py-24 px-4 sm:px-6 bg-abyss">

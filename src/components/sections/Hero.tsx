@@ -86,16 +86,34 @@ export default function Hero() {
         {/* Mascot with parallax + float */}
         <div
           ref={mascotRef}
-          className="transition-transform duration-200 ease-out animate-[float_4s_ease-in-out_infinite]"
+          className="relative transition-transform duration-200 ease-out animate-[float_4s_ease-in-out_infinite]"
           style={{ willChange: "transform" }}
         >
           <Image
             src="/brand/mascot-rear.png"
             alt="Project Odyssey backpacker mascot"
-            width={220}
-            height={220}
-            className="mascot-glow object-contain select-none"
+            width={240}
+            height={240}
+            className="object-contain select-none"
             priority
+          />
+          {/* Radial vignette — hides white PNG background, gives natural dark-glow look */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 50%, transparent 36%, #06080C 72%)",
+            }}
+            aria-hidden
+          />
+          {/* Blue bloom behind mascot */}
+          <div
+            className="absolute inset-0 -z-10 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(circle at 50% 50%, rgba(88,176,224,0.18) 0%, transparent 70%)",
+            }}
+            aria-hidden
           />
         </div>
 
@@ -112,8 +130,8 @@ export default function Hero() {
 
         {/* Sub-headline */}
         <p className="text-lg sm:text-xl text-sky-tint max-w-xl leading-relaxed">
-          A backpacker stay in Pune — private rooms, a whole flat, direct booking. No middleman, no
-          markup.
+          A backpacker hostel in Ahmedabad — bunk beds, privacy curtains, personal lockers. Book
+          direct. No OTA markup. No middleman.
         </p>
 
         {/* Booking widget */}

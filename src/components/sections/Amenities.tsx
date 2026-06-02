@@ -3,12 +3,12 @@ import {
   UtensilsCrossed,
   Wind,
   Droplets,
-  Monitor,
+  Lamp,
   WashingMachine,
   Coffee,
   ShieldCheck,
   MapPin,
-  ParkingSquare,
+  Lock,
 } from "lucide-react";
 import { amenities } from "@/config/property";
 import { labels } from "@/config/labels";
@@ -18,12 +18,12 @@ const iconComponents: Record<string, React.ReactNode> = {
   UtensilsCrossed: <UtensilsCrossed size={28} strokeWidth={1.5} />,
   Wind: <Wind size={28} strokeWidth={1.5} />,
   Droplets: <Droplets size={28} strokeWidth={1.5} />,
-  Monitor: <Monitor size={28} strokeWidth={1.5} />,
+  Lamp: <Lamp size={28} strokeWidth={1.5} />,
+  Lock: <Lock size={28} strokeWidth={1.5} />,
   WashingMachine: <WashingMachine size={28} strokeWidth={1.5} />,
   Coffee: <Coffee size={28} strokeWidth={1.5} />,
   ShieldCheck: <ShieldCheck size={28} strokeWidth={1.5} />,
   MapPin: <MapPin size={28} strokeWidth={1.5} />,
-  ParkingSquare: <ParkingSquare size={28} strokeWidth={1.5} />,
 };
 
 export default function Amenities() {
@@ -51,6 +51,14 @@ export default function Amenities() {
               <span className="text-xs text-sky-tint font-medium leading-tight">{a.label}</span>
             </div>
           ))}
+        </div>
+
+        {/* Per-bed amenities callout */}
+        <div className="mt-8 p-5 rounded-2xl bg-odyssey-blue/5 border border-odyssey-blue/15 text-center">
+          <p className="text-sm text-sky-tint">
+            Every bed includes:{" "}
+            <span className="text-ice font-medium">Privacy curtain · Reading light · Power socket · Personal locker</span>
+          </p>
         </div>
       </div>
     </section>

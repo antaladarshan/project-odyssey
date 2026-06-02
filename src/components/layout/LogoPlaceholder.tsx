@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { siteConfig } from "@/config/site";
 
 interface LogoPlaceholderProps {
   variant?: "dark" | "light";
@@ -27,14 +26,22 @@ export default function LogoPlaceholder({
 
   return (
     <div className={`flex items-center gap-2 select-none ${className}`}>
-      <Image
-        src="/brand/mascot-rear-sm.png"
-        alt="Project Odyssey mascot"
-        width={s.mascot}
-        height={s.mascot}
-        className="mascot-glow-sm object-contain"
-        priority
-      />
+      <div className="relative shrink-0" style={{ width: s.mascot, height: s.mascot }}>
+        <Image
+          src="/brand/mascot-rear-sm.png"
+          alt="Project Odyssey mascot"
+          width={s.mascot}
+          height={s.mascot}
+          className="object-contain"
+          priority
+        />
+        {/* Vignette to blend white PNG edges into nav background */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(circle at 50% 50%, transparent 38%, var(--bg-surface, #06080C) 72%)" }}
+          aria-hidden
+        />
+      </div>
       {showWordmark && (
         <div className={`font-display font-bold leading-none ${s.text} ${textColor}`}>
           <span className="tracking-widest text-[0.6em] font-light opacity-70">PROJECT</span>

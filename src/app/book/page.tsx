@@ -39,7 +39,7 @@ export default function BookPage() {
                   <div>
                     <p className="text-sm font-medium text-ice">{room.name}</p>
                     <p className="text-xs text-sky-tint/60 mt-0.5">
-                      Sleeps {room.capacity} · ₹{room.basePricePerNight.toLocaleString("en-IN")}/night
+                      {room.beds} beds · ₹{room.basePricePerBedPerNight.toLocaleString("en-IN")}/bed/night
                     </p>
                   </div>
                   <span className="text-xs text-odyssey-blue group-hover:text-mascot-glow font-semibold transition-colors">
