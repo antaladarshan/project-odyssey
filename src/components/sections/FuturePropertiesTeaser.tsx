@@ -9,7 +9,7 @@ const futureDestinations = [
 
 export default function FuturePropertiesTeaser() {
   return (
-    <section className="py-20 px-4 sm:px-6 bg-ink">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 bg-ink">
       <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-8">
         <div className="p-3 rounded-full bg-azure-core/10 border border-azure-core/20">
           <Compass size={24} className="text-odyssey-blue" />

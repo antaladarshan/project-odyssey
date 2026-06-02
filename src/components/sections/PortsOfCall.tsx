@@ -13,7 +13,7 @@ export default function PortsOfCall() {
   const mapEmbedUrl = `https://maps.google.com/maps?q=Aishwarya+Apartments+Jodhpur+Village+Ahmedabad+Gujarat+380015&z=15&output=embed`;
 
   return (
-    <section id="neighborhood" className="py-24 px-4 sm:px-6 bg-abyss">
+    <section id="neighborhood" className="py-14 sm:py-24 px-4 sm:px-6 bg-abyss">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14 flex flex-col gap-3">
           <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">

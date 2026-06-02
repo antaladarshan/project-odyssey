@@ -28,7 +28,7 @@ const iconComponents: Record<string, React.ReactNode> = {
 
 export default function Amenities() {
   return (
-    <section id="amenities" className="py-24 px-4 sm:px-6 bg-abyss">
+    <section id="amenities" className="py-14 sm:py-24 px-4 sm:px-6 bg-abyss">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14 flex flex-col gap-3">
           <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">

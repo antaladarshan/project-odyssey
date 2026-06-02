@@ -9,7 +9,7 @@ export default function Faq() {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="py-24 px-4 sm:px-6 bg-abyss">
+    <section id="faq" className="py-14 sm:py-24 px-4 sm:px-6 bg-abyss">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-12 flex flex-col gap-3">
           <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">

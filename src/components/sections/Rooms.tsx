@@ -85,7 +85,7 @@ export default function Rooms() {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   return (
-    <section id="rooms" className="py-24 px-4 sm:px-6 bg-ink">
+    <section id="rooms" className="py-14 sm:py-24 px-4 sm:px-6 bg-ink">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-14 flex flex-col gap-3">

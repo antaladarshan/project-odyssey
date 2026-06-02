@@ -396,7 +396,7 @@ export default function Gallery() {
 
   return (
     <>
-      <section id="gallery" className="py-24 px-4 sm:px-6 bg-ink">
+      <section id="gallery" className="py-14 sm:py-24 px-4 sm:px-6 bg-ink">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14 flex flex-col gap-3">
             <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">

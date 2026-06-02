@@ -4,7 +4,7 @@ import { labels } from "@/config/labels";
 
 export default function ReturningGuest() {
   return (
-    <section className="py-20 px-4 sm:px-6 bg-abyss border-y border-white/5">
+    <section className="py-12 sm:py-20 px-4 sm:px-6 bg-abyss border-y border-white/5">
       <div className="max-w-3xl mx-auto text-center flex flex-col items-center gap-5">
         <div className="p-3 rounded-full bg-odyssey-blue/10 border border-odyssey-blue/20">
           <RotateCcw size={22} className="text-odyssey-blue" />

@@ -19,7 +19,7 @@ export default function Reviews() {
   const r = reviews[idx];
 
   return (
-    <section id="reviews" className="py-24 px-4 sm:px-6 bg-ink">
+    <section id="reviews" className="py-14 sm:py-24 px-4 sm:px-6 bg-ink">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-14 flex flex-col gap-3">
           <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">
