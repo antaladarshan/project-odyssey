@@ -9,6 +9,7 @@ export interface Room {
   bedType: string;
   capacity: number;
   basePricePerBedPerNight: number;
+  wholeRoomPerNight: number;
   images: string[];
   amenities: string[];
   description: string;
@@ -50,7 +51,8 @@ export const rooms: Room[] = [
     beds: 4,
     bedType: "Bunk Beds",
     capacity: 4,
-    basePricePerBedPerNight: 499,
+    basePricePerBedPerNight: 700,
+    wholeRoomPerNight: 3000,
     images: ["/gallery/room-2a.webp"],
     amenities: ["Wi-Fi", "AC", "Privacy Curtain", "Reading Light", "Locker", "Hot Water"],
     description:
@@ -66,11 +68,12 @@ export const rooms: Room[] = [
     beds: 4,
     bedType: "Bunk Beds",
     capacity: 4,
-    basePricePerBedPerNight: 499,
+    basePricePerBedPerNight: 700,
+    wholeRoomPerNight: 3000,
     images: ["/gallery/room-1a.webp"],
     amenities: ["Wi-Fi", "AC", "Privacy Curtain", "Reading Light", "Locker", "Hot Water"],
     description:
-      "Sister room to The Explorer — same 4-bed bunk setup with curtains and personal lighting. The window-side beds get Ahmedabad morning light.",
+      "Sister room to The Navigator — same 4-bed bunk setup with curtains and personal lighting. The window-side beds get Ahmedabad morning light.",
     sqft: 160,
   },
   {
@@ -81,7 +84,8 @@ export const rooms: Room[] = [
     beds: 6,
     bedType: "Bunk Beds",
     capacity: 6,
-    basePricePerBedPerNight: 399,
+    basePricePerBedPerNight: 700,
+    wholeRoomPerNight: 5000,
     images: ["/gallery/room-3a.webp"],
     amenities: ["Wi-Fi", "AC", "Privacy Curtain", "Reading Light", "Locker", "Hot Water"],
     description:
@@ -194,6 +198,14 @@ export const faqs = [
   {
     q: "How does booking work?",
     a: "Send a booking request via WhatsApp with your dates and number of beds. We confirm within a few hours and collect payment. Simple and direct.",
+  },
+  {
+    q: "Are there discounts for longer stays?",
+    a: "Yes! Book for 7+ nights and get 15% off. Stay for a month and get 60% off — that brings the per-bed rate down to ₹280/night. Discounts are applied automatically when you book.",
+  },
+  {
+    q: "Can I book the whole room privately?",
+    a: "Yes. Book all 4 beds in The Explorer or The Navigator for ₹3,000/night, or all 6 beds in The Voyager for ₹5,000/night. Weekly and monthly discounts apply to whole-room bookings too.",
   },
   {
     q: "Are meals included?",

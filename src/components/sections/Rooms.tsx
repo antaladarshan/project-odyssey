@@ -2,13 +2,16 @@
 
 import Image from "next/image";
 import {
-  Wifi, Wind, Droplets, Lock, Lamp, Coffee,
-  UtensilsCrossed, Users, BedDouble, ChevronDown, ChevronUp,
+  Wifi, Wind, Droplets, Lock, Lamp, Coffee, UtensilsCrossed,
+  Users, BedDouble, ChevronDown, ChevronUp, Sparkles, Tag,
 } from "lucide-react";
 import { useState } from "react";
 import { rooms } from "@/config/property";
 import { labels } from "@/config/labels";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
+import { PRICING } from "@/lib/pricing";
+
+const fmt = (n: number) => n.toLocaleString("en-IN");
 
 const amenityIcons: Record<string, React.ReactNode> = {
   "Wi-Fi": <Wifi size={14} />,
@@ -152,11 +155,15 @@ export default function Rooms() {
                             <span className="capitalize">{room.type.replace("_", " ")}</span>
                           </div>
                         </div>
-                        <div className="text-right shrink-0">
+                        {/* Pricing block */}
+                        <div className="text-right shrink-0 flex flex-col gap-0.5">
                           <p className="text-2xl font-display font-bold text-ice">
-                            ₹{room.basePricePerBedPerNight}
+                            ₹{fmt(room.basePricePerBedPerNight)}
+                            <span className="text-sm font-normal text-sky-tint/60 ml-1">/ bed / night</span>
                           </p>
-                          <p className="text-[11px] text-sky-tint/60">per bed / night</p>
+                          <p className="text-xs text-sky-tint/60">
+                            or <span className="text-sky-tint font-semibold">₹{fmt(room.wholeRoomPerNight)}</span> for whole room
+                          </p>
                         </div>
                       </div>
 
@@ -183,6 +190,26 @@ export default function Rooms() {
                           </span>
                         ))}
                       </div>
+                    </div>
+
+                    {/* Discount badges */}
+                    <div className="px-5 pb-3 flex flex-wrap gap-2">
+                      {PRICING.discounts.map((d) => (
+                        <span
+                          key={d.minNights}
+                          className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${
+                            d.pct >= 50
+                              ? "bg-odyssey-blue/10 border-odyssey-blue/25 text-odyssey-blue"
+                              : "bg-green-400/8 border-green-400/20 text-green-400"
+                          }`}
+                        >
+                          <Sparkles size={10} />
+                          {d.minNights}+ nights: <strong>{d.badge}</strong>
+                        </span>
+                      ))}
+                      <span className="flex items-center gap-1 text-[11px] text-sky-tint/50">
+                        <Tag size={10} /> Discounts auto-applied on booking
+                      </span>
                     </div>
 
                     {/* Availability / Book row */}
@@ -232,6 +259,49 @@ export default function Rooms() {
               </div>
             );
           })}
+        </div>
+
+        {/* Pricing tiers summary */}
+        <div className="mt-8 rounded-2xl border border-white/8 bg-abyss overflow-hidden">
+          <div className="px-5 py-4 border-b border-white/6 flex items-center gap-2">
+            <Tag size={15} className="text-odyssey-blue" />
+            <span className="text-sm font-semibold text-ice">Pricing & Discounts</span>
+            <span className="ml-auto text-xs text-sky-tint/50">Auto-applied when you book via WhatsApp</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/6">
+            {/* Per bed */}
+            <div className="p-5 flex flex-col gap-1">
+              <p className="text-xs text-sky-tint/60 uppercase tracking-wider">Per Bed</p>
+              <p className="text-2xl font-display font-bold text-ice">₹{fmt(PRICING.perBedPerNight)}</p>
+              <p className="text-xs text-sky-tint/60">per night, any room</p>
+            </div>
+            {/* 4-bed whole room */}
+            <div className="p-5 flex flex-col gap-1">
+              <p className="text-xs text-sky-tint/60 uppercase tracking-wider">4-Bed Private</p>
+              <p className="text-2xl font-display font-bold text-ice">₹{fmt(PRICING.wholeRoom4Bed)}</p>
+              <p className="text-xs text-sky-tint/60">whole room / night</p>
+            </div>
+            {/* 7-day discount */}
+            <div className="p-5 flex flex-col gap-1 border-t sm:border-t-0 border-white/6">
+              <p className="text-xs text-green-400/80 uppercase tracking-wider flex items-center gap-1">
+                <Sparkles size={10} /> Weekly Stay (7+ nights)
+              </p>
+              <p className="text-2xl font-display font-bold text-green-400">15% off</p>
+              <p className="text-xs text-sky-tint/60">
+                ₹{fmt(Math.round(PRICING.perBedPerNight * 0.85))}/bed/night
+              </p>
+            </div>
+            {/* Monthly discount */}
+            <div className="p-5 flex flex-col gap-1 bg-odyssey-blue/5 border-t sm:border-t-0 border-white/6">
+              <p className="text-xs text-odyssey-blue uppercase tracking-wider flex items-center gap-1">
+                <Sparkles size={10} /> Monthly Stay (30+ nights)
+              </p>
+              <p className="text-2xl font-display font-bold text-odyssey-blue">60% off</p>
+              <p className="text-xs text-sky-tint/60">
+                just ₹{fmt(Math.round(PRICING.perBedPerNight * 0.40))}/bed/night
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Group booking note */}

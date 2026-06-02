@@ -51,7 +51,7 @@ export default function Intro() {
           </div>
           <div className="w-px bg-white/10 self-stretch" />
           <div className="flex flex-col items-center gap-1">
-            <span className="text-3xl font-display font-bold gradient-text">₹399</span>
+            <span className="text-3xl font-display font-bold gradient-text">₹700</span>
             <span className="opacity-70">Per Bed / Night</span>
           </div>
         </div>
