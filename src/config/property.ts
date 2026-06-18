@@ -29,6 +29,8 @@ export interface PropertyConfig {
   images?: string[];
   lat: number;
   lng: number;
+  /** Direct Google Maps link to the exact place (opens the named pin). */
+  mapsUrl?: string;
   comingSoon?: boolean;
   tag?: string;
 }
@@ -44,8 +46,9 @@ export const property: PropertyConfig = {
     "A 3-room backpacker hostel in the heart of Ahmedabad. Bunk beds, privacy curtains, fast Wi-Fi, and a community of fellow travelers — all without the OTA markup.",
   heroMedia: "/brand/mascot-rear.png",
   images: ["/gallery/room-1a.webp", "/gallery/room-2a.webp", "/gallery/room-3a.webp"],
-  lat: 23.0292,
-  lng: 72.5313,
+  lat: 23.0246061,
+  lng: 72.5233259,
+  mapsUrl: "https://maps.app.goo.gl/LbiucnPctPXGrzLH9",
 };
 
 // ── All properties (active + coming soon) ────────────────────────────────────
@@ -242,7 +245,7 @@ export const faqs = [
   },
   {
     q: "Are there discounts for longer stays?",
-    a: "Yes! The per-night rate drops automatically for every extra night — from ₹700 for 1 night down to ₹499 for 7 nights and ₹299 for monthly stays. Discounts are applied automatically.",
+    a: "Yes! The per-night rate drops automatically for every extra night — from ₹700 for 1 night down to ₹497 for 7 nights and ₹357 for monthly stays (27+ nights). Discounts are applied automatically.",
   },
   {
     q: "What is the WORKATION plan?",

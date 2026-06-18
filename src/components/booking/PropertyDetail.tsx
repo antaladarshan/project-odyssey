@@ -174,7 +174,7 @@ export default function PropertyDetail({ property }: Props) {
               <div className="bg-ink border border-white/8 rounded-2xl overflow-hidden">
                 <div className="bg-white/5 h-40 flex items-center justify-center">
                   <a
-                    href={`https://maps.google.com/?q=${property.lat},${property.lng}`}
+                    href={property.mapsUrl ?? `https://maps.google.com/?q=${property.lat},${property.lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 text-odyssey-blue hover:text-azure-deep font-semibold text-sm"

@@ -289,9 +289,9 @@ export default function Rooms() {
             {/* Monthly */}
             <div className="p-5 flex flex-col gap-1 bg-odyssey-blue/5">
               <p className="text-xs text-mascot-glow uppercase tracking-wider flex items-center gap-1">
-                <Sparkles size={10} /> 30+ Nights
+                <Sparkles size={10} /> 27+ Nights
               </p>
-              <p className="text-2xl font-display font-bold text-mascot-glow">₹299<span className="text-sm font-normal text-sky-tint ml-1">~57% off</span></p>
+              <p className="text-2xl font-display font-bold text-mascot-glow">₹357<span className="text-sm font-normal text-sky-tint ml-1">~49% off</span></p>
               <p className="text-xs text-sky-tint">+ WORKATION extra 15%</p>
             </div>
           </div>

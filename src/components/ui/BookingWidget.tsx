@@ -98,10 +98,10 @@ export default function BookingWidget({ className = "" }: { className?: string }
       {!pricing && (
         <div className="flex gap-2 flex-wrap">
           <span className="flex items-center gap-1.5 text-[11px] bg-green-400/10 border border-green-400/20 text-green-400 px-2.5 py-1 rounded-full font-medium">
-            <Sparkles size={10} /> 7 nights → ₹499/night
+            <Sparkles size={10} /> 7 nights → ₹497/night
           </span>
           <span className="flex items-center gap-1.5 text-[11px] bg-odyssey-blue/10 border border-odyssey-blue/20 text-odyssey-blue px-2.5 py-1 rounded-full font-medium">
-            <Sparkles size={10} /> Monthly → ₹299/night
+            <Sparkles size={10} /> Monthly → ₹357/night
           </span>
         </div>
       )}

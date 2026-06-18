@@ -213,8 +213,12 @@ describe("calcBilling — workation coupon on a pre-computed roomCharges", () =>
 
 // ── Project Odyssey config integration ───────────────────────────────────────
 
-describe("Project Odyssey config — ₹700 base, 29% weekly, 57% monthly", () => {
-  const odysseyCfg: Partial<PricingConfig> = { weeklyDiscountPct: 0.29, monthlyDiscountPct: 0.57 };
+describe("Project Odyssey config — ₹700 base, 29% weekly, 49% monthly (27+)", () => {
+  const odysseyCfg: Partial<PricingConfig> = {
+    weeklyDiscountPct: 0.29,
+    monthlyMinNights: 27,
+    monthlyDiscountPct: 0.49,
+  };
 
   it("1 night → ₹700, no discount", () => {
     const r = calcPricing(1, 700, { config: odysseyCfg });
@@ -239,9 +243,26 @@ describe("Project Odyssey config — ₹700 base, 29% weekly, 57% monthly", () =
     expect(r7.total).toBeLessThan(r6.total);
   });
 
-  it("28+ nights → ~57% off", () => {
+  it("26 nights still on weekly tier (29% off, below monthly threshold)", () => {
+    const r = calcPricing(26, 700, { config: odysseyCfg });
+    expect(r.losDiscountPct).toBe(0.29);
+  });
+
+  it("27+ nights → 49% off, ~₹357/night", () => {
+    const r = calcPricing(27, 700, { config: odysseyCfg });
+    expect(r.losDiscountPct).toBe(0.49);
+    expect(r.perNight).toBe(Math.round(700 * (1 - 0.49))); // 357
+  });
+
+  it("30-night room charges = ₹10,710", () => {
     const r = calcPricing(30, 700, { config: odysseyCfg });
-    expect(r.losDiscountPct).toBe(0.57);
-    expect(r.perNight).toBe(Math.round(700 * (1 - 0.57)));
+    expect(r.total).toBe(Math.round(30 * 700 * (1 - 0.49))); // 10710
+  });
+
+  it("30-night stay WITH WORKATION stays ≥ ₹9,000 (post-coupon floor)", () => {
+    const r = calcPricing(30, 700, { config: odysseyCfg });
+    const b = calcBilling({ roomCharges: r.total, nights: 30, workation: true, config: odysseyCfg });
+    expect(b.totalPrice).toBe(9103); // 10,710 − 1,607
+    expect(b.totalPrice).toBeGreaterThanOrEqual(9000);
   });
 });

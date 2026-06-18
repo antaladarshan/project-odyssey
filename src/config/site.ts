@@ -13,8 +13,8 @@ export const siteConfig = {
     state: "Gujarat",
     country: "India",
     pincode: "380015",
-    lat: 23.0292,
-    lng: 72.5313,
+    lat: 23.0246061,
+    lng: 72.5233259,
   },
   socials: {
     instagram: "https://www.instagram.com/projectodyssey.in/",

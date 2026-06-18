@@ -45,12 +45,16 @@ export const DEFAULT_CONFIG: PricingConfig = {
 };
 
 // Project Odyssey's specific discount rates.
-// Derived from user anchors: ~₹500/night at 7 nights, ~₹300/night at 30 nights.
-//   700 × (1 – 0.29) = 497 ≈ 500  ✓
-//   700 × (1 – 0.57) = 301 ≈ 300  ✓
+// Anchors: ~₹497/night at 7 nights, ~₹357/night for a month.
+//   700 × (1 – 0.29) = 497  → 7n = ₹3,479
+//   700 × (1 – 0.49) = 357  → 30n room charges = ₹10,710
+// Floor check: a 30-night stay WITH the 15% WORKATION coupon still totals
+//   ≈ ₹9,103 (10,710 − 1,607) — kept around ₹9,000 minimum even after the coupon.
+// Monthly tier starts at 27 nights.
 export const ODYSSEY_PRICING_CONFIG: Partial<PricingConfig> = {
   weeklyDiscountPct: 0.29,
-  monthlyDiscountPct: 0.57,
+  monthlyMinNights: 27,
+  monthlyDiscountPct: 0.49,
   allowLongerCheaper: true,
 };
 
@@ -263,7 +267,7 @@ export const PRICING = {
   wholeRoom4Bed: 3000,
   wholeRoom6Bed: 5000,
   discounts: [
-    { minNights: 28, pct: 57, label: "Monthly Stay", badge: "57% off" },
+    { minNights: 27, pct: 49, label: "Monthly Stay", badge: "49% off" },
     { minNights: 7, pct: 29, label: "Weekly Stay", badge: "29% off" },
   ],
 } as const;
