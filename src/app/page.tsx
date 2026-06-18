@@ -9,55 +9,26 @@ import Reviews from "@/components/sections/Reviews";
 import ReturningGuest from "@/components/sections/ReturningGuest";
 import FuturePropertiesTeaser from "@/components/sections/FuturePropertiesTeaser";
 import Faq from "@/components/sections/Faq";
-import ScrollReveal from "@/components/ui/ScrollReveal";
 
 const RouteLine = lazy(() => import("@/components/three/RouteLine"));
 
 export default function HomePage() {
   return (
     <>
-      {/* Scroll-animated route line — lazy, degrades to static SVG */}
       <Suspense fallback={null}>
         <RouteLine />
       </Suspense>
 
       <Hero />
-
-      <ScrollReveal>
-        <Intro />
-      </ScrollReveal>
-
-      <ScrollReveal delay={100}>
-        <Rooms />
-      </ScrollReveal>
-
-      <ScrollReveal delay={50}>
-        <Amenities />
-      </ScrollReveal>
-
-      <ScrollReveal delay={80}>
-        <Gallery />
-      </ScrollReveal>
-
-      <ScrollReveal delay={60}>
-        <PortsOfCall />
-      </ScrollReveal>
-
-      <ScrollReveal delay={80}>
-        <Reviews />
-      </ScrollReveal>
-
-      <ScrollReveal>
-        <ReturningGuest />
-      </ScrollReveal>
-
-      <ScrollReveal delay={60}>
-        <FuturePropertiesTeaser />
-      </ScrollReveal>
-
-      <ScrollReveal>
-        <Faq />
-      </ScrollReveal>
+      <Intro />
+      <Rooms />
+      <Amenities />
+      <Gallery />
+      <PortsOfCall />
+      <Reviews />
+      <ReturningGuest />
+      <FuturePropertiesTeaser />
+      <Faq />
     </>
   );
 }

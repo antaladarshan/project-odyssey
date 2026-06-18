@@ -15,6 +15,7 @@ export interface Room {
   description: string;
   badge?: string;
   sqft?: number;
+  bedsAvailable: number; // 0 = SOLD OUT
 }
 
 export interface PropertyConfig {
@@ -25,10 +26,14 @@ export interface PropertyConfig {
   address?: string;
   description: string;
   heroMedia: string;
+  images?: string[];
   lat: number;
   lng: number;
+  comingSoon?: boolean;
+  tag?: string;
 }
 
+// ── Active property ────────────────────────────────────────────────────────────
 export const property: PropertyConfig = {
   id: "prop-01",
   slug: "project-odyssey-ahmedabad",
@@ -38,10 +43,43 @@ export const property: PropertyConfig = {
   description:
     "A 3-room backpacker hostel in the heart of Ahmedabad. Bunk beds, privacy curtains, fast Wi-Fi, and a community of fellow travelers — all without the OTA markup.",
   heroMedia: "/brand/mascot-rear.png",
+  images: ["/gallery/room-1a.webp", "/gallery/room-2a.webp", "/gallery/room-3a.webp"],
   lat: 23.0292,
   lng: 72.5313,
 };
 
+// ── All properties (active + coming soon) ────────────────────────────────────
+export const properties: PropertyConfig[] = [
+  property,
+  {
+    id: "prop-02",
+    slug: "project-odyssey-mumbai",
+    name: "Project Odyssey",
+    city: "Mumbai",
+    address: "Bandra West, Mumbai, Maharashtra",
+    description: "A sea-facing bunk hostel in Bandra. Catch sunsets, meet artists, hop on the local.",
+    heroMedia: "/brand/mascot-rear.png",
+    lat: 19.0596,
+    lng: 72.8295,
+    comingSoon: true,
+    tag: "Opening Q3 2026",
+  },
+  {
+    id: "prop-03",
+    slug: "project-odyssey-goa",
+    name: "Project Odyssey",
+    city: "Goa",
+    address: "Anjuna, North Goa",
+    description: "Steps from the beach. Sun, sand, and a community of wanderers — your base for the coast.",
+    heroMedia: "/brand/mascot-rear.png",
+    lat: 15.5736,
+    lng: 73.7443,
+    comingSoon: true,
+    tag: "Opening Q4 2026",
+  },
+];
+
+// ── Rooms (for the active Ahmedabad property) ─────────────────────────────────
 export const rooms: Room[] = [
   {
     id: "room-01",
@@ -59,6 +97,7 @@ export const rooms: Room[] = [
       "A cozy 4-bed bunk dorm with privacy curtains, personal reading lights, under-bed lockers, and AC. Perfect for solo travelers and small groups.",
     badge: "Most Popular",
     sqft: 160,
+    bedsAvailable: 3,
   },
   {
     id: "room-02",
@@ -73,8 +112,9 @@ export const rooms: Room[] = [
     images: ["/gallery/room-1a.webp"],
     amenities: ["Wi-Fi", "AC", "Privacy Curtain", "Reading Light", "Locker", "Hot Water"],
     description:
-      "Sister room to The Navigator — same 4-bed bunk setup with curtains and personal lighting. The window-side beds get Ahmedabad morning light.",
+      "Sister room to The Explorer — same 4-bed bunk setup with curtains and personal lighting. The window-side beds get Ahmedabad morning light.",
     sqft: 160,
+    bedsAvailable: 4,
   },
   {
     id: "room-03",
@@ -92,6 +132,7 @@ export const rooms: Room[] = [
       "Our 6-bed dormitory — the social heart of Project Odyssey. Three bunk pairs, privacy curtains on every bed, shared locker row. Best value, best stories.",
     badge: "Best Value",
     sqft: 220,
+    bedsAvailable: 5,
   },
 ];
 
@@ -201,7 +242,11 @@ export const faqs = [
   },
   {
     q: "Are there discounts for longer stays?",
-    a: "Yes! Book for 7+ nights and get 15% off. Stay for a month and get 60% off — that brings the per-bed rate down to ₹280/night. Discounts are applied automatically when you book.",
+    a: "Yes! The per-night rate drops automatically for every extra night — from ₹700 for 1 night down to ₹499 for 7 nights and ₹299 for monthly stays. Discounts are applied automatically.",
+  },
+  {
+    q: "What is the WORKATION plan?",
+    a: "Staying 7+ nights and working remotely? Apply the WORKATION coupon at checkout for an extra flat 15% off on top of your long-stay discount. Perfect for digital nomads.",
   },
   {
     q: "Can I book the whole room privately?",

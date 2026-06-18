@@ -2,56 +2,92 @@
 
 /* ── Brand tokens ─────────────────────────────────────────── */
 :root {
+  /* Original dark Odyssey palette */
   --odyssey-blue: #48a0c8;
-  --azure-deep: #3078b8;
-  --mascot-glow: #58b0e0;
-  --azure-core: #1060c0;
-  --sky-tint: #88c0d8;
-  --ice: #e8f0f8;
-  --ink: #0a0e14;
-  --abyss: #06080c;
-  --cloud: #f7fafc;
+  --azure-deep:   #3078b8;
+  --mascot-glow:  #58b0e0;
+  --azure-core:   #1060c0;
+  --sky-tint:     #88c0d8;
+  --ice:          #e8f0f8;
+  --ink:          #0a0e14;
+  --abyss:        #06080c;
+  --cloud:        #f7fafc;
+
+  /* Summer accent tokens (used only in booking components) */
+  --coral:        #FF6B6B;
+  --coral-dark:   #E85555;
+  --palm:         #2EC4A6;
+  --sun:          #FFD166;
+  --sand:         #FFF7EC;
+  --shell:        #FBE9D0;
+  --ocean-teal:   #48a0c8;
+  --deep-sea:     #3078b8;
+  --dusk:         #0a0e14;
+  --dusk-light:   #162028;
+  --fog:          #88c0d8;
+  --ice-surf:     #e8f0f8;
 }
 
 /* ── Tailwind v4 theme ────────────────────────────────────── */
 @theme inline {
   /* Fonts */
   --font-display: var(--font-bricolage);
-  --font-body: var(--font-inter);
-  --font-sans: var(--font-inter);
+  --font-body:    var(--font-inter);
+  --font-sans:    var(--font-inter);
 
-  /* Brand colors */
+  /* Original brand colors */
   --color-odyssey-blue: var(--odyssey-blue);
-  --color-azure-deep: var(--azure-deep);
-  --color-mascot-glow: var(--mascot-glow);
-  --color-azure-core: var(--azure-core);
-  --color-sky-tint: var(--sky-tint);
-  --color-ice: var(--ice);
-  --color-ink: var(--ink);
-  --color-abyss: var(--abyss);
-  --color-cloud: var(--cloud);
+  --color-azure-deep:   var(--azure-deep);
+  --color-mascot-glow:  var(--mascot-glow);
+  --color-azure-core:   var(--azure-core);
+  --color-sky-tint:     var(--sky-tint);
+  --color-ice:          var(--ice);
+  --color-ink:          var(--ink);
+  --color-abyss:        var(--abyss);
+  --color-cloud:        var(--cloud);
 
-  /* Semantic light/dark surface tokens */
-  --color-surface: var(--bg-surface);
-  --color-surface-2: var(--bg-surface-2);
-  --color-text: var(--fg-text);
+  /* Booking-component accent colors */
+  --color-coral:      var(--coral);
+  --color-coral-dark: var(--coral-dark);
+  --color-palm:       var(--palm);
+  --color-sun:        var(--sun);
+  --color-sand:       var(--sand);
+  --color-shell:      #1a2030;
+  --color-ocean-teal: var(--odyssey-blue);
+  --color-deep-sea:   var(--azure-deep);
+  --color-dusk:       var(--ice);
+  --color-dusk-light: #162028;
+  --color-fog:        var(--sky-tint);
+  --color-ice-surf:   #111820;
+
+  /* Semantic tokens */
+  --color-surface:    var(--bg-surface);
+  --color-surface-2:  var(--bg-surface-2);
+  --color-text:       var(--fg-text);
   --color-text-muted: var(--fg-muted);
 }
 
-/* ── Light theme ──────────────────────────────────────────── */
+/* ── Dark theme (default) ─────────────────────────────────── */
 :root {
-  --bg-surface: var(--cloud);
-  --bg-surface-2: var(--ice);
-  --fg-text: var(--ink);
-  --fg-muted: #4a5568;
+  --bg-surface:   var(--abyss);
+  --bg-surface-2: var(--ink);
+  --fg-text:      var(--ice);
+  --fg-muted:     var(--sky-tint);
 }
 
-/* ── Dark theme (default) ─────────────────────────────────── */
 .dark {
-  --bg-surface: var(--abyss);
+  --bg-surface:   var(--abyss);
   --bg-surface-2: var(--ink);
-  --fg-text: var(--ice);
-  --fg-muted: var(--sky-tint);
+  --fg-text:      var(--ice);
+  --fg-muted:     var(--sky-tint);
+}
+
+/* ── Light theme ──────────────────────────────────────────── */
+.light {
+  --bg-surface:   var(--cloud);
+  --bg-surface-2: var(--ice);
+  --fg-text:      var(--ink);
+  --fg-muted:     #4a5568;
 }
 
 /* ── Base ─────────────────────────────────────────────────── */
@@ -60,8 +96,8 @@ html {
 }
 
 body {
-  background-color: var(--bg-surface);
-  color: var(--fg-text);
+  background-color: var(--abyss);
+  color: var(--ice);
   font-family: var(--font-body), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -91,13 +127,13 @@ body {
 }
 
 /* ── Custom scrollbar ────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: var(--abyss);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--odyssey-blue);
-  border-radius: 3px;
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--abyss); }
+::-webkit-scrollbar-thumb { background: var(--odyssey-blue); border-radius: 3px; }
+
+/* ── Booking page overrides (light surface on dark bg) ──── */
+.booking-surface {
+  background: var(--ink);
+  border-color: rgba(255,255,255,0.08);
+  color: var(--ice);
 }

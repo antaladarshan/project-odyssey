@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import LogoPlaceholder from "./LogoPlaceholder";
-import ThemeToggle from "./ThemeToggle";
 import { labels } from "@/config/labels";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
 
 const navLinks = [
-  { label: "The Stay", href: "/#rooms" },
+  { label: "Properties", href: "/properties/" },
+  { label: "The Stay", href: "/property/project-odyssey-ahmedabad/" },
   { label: "Story", href: "/about" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
@@ -40,7 +40,7 @@ export default function Nav() {
       <header
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-abyss/92 backdrop-blur-md border-b border-white/5 shadow-lg shadow-black/30"
+            ? "bg-abyss/95 backdrop-blur-md border-b border-white/8 shadow-lg shadow-black/30"
             : "bg-transparent"
         }`}
       >
@@ -51,10 +51,10 @@ export default function Nav() {
           </Link>
 
           {/* Desktop links */}
-          <ul className="hidden md:flex items-center gap-6 text-sm font-medium text-sky-tint">
+          <ul className="hidden md:flex items-center gap-6 text-sm font-medium text-sky-tint/80">
             {navLinks.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="hover:text-odyssey-blue transition-colors">
+                <Link href={l.href} className="hover:text-odyssey-blue hover:text-opacity-100 transition-colors">
                   {l.label}
                 </Link>
               </li>
@@ -63,23 +63,19 @@ export default function Nav() {
 
           {/* Desktop actions */}
           <div className="hidden md:flex items-center gap-2">
-            <ThemeToggle />
             <Link href="/account" className="text-sm text-sky-tint hover:text-odyssey-blue transition-colors px-3 py-1.5">
               {labels.nav.account}
             </Link>
-            <a
-              href={bookHref}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/property/project-odyssey-ahmedabad/"
               className="bg-odyssey-blue hover:bg-azure-deep text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors"
             >
               {labels.nav.book}
-            </a>
+            </Link>
           </div>
 
-          {/* Mobile: theme toggle + burger */}
+          {/* Mobile burger */}
           <div className="md:hidden flex items-center gap-1">
-            <ThemeToggle />
             <button
               onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
               aria-label="Toggle menu"
@@ -94,7 +90,7 @@ export default function Nav() {
         {/* Mobile dropdown */}
         {open && (
           <div
-            className="md:hidden bg-ink/97 backdrop-blur-md border-t border-white/5 px-5 py-5 flex flex-col gap-3"
+            className="md:hidden bg-ink/98 backdrop-blur-md border-t border-white/8 px-5 py-5 flex flex-col gap-3"
             onClick={(e) => e.stopPropagation()}
           >
             {navLinks.map((l) => (
@@ -114,29 +110,25 @@ export default function Nav() {
             >
               {labels.nav.account}
             </Link>
-            <a
-              href={bookHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 bg-odyssey-blue hover:bg-azure-deep text-white text-center font-semibold py-3.5 rounded-2xl transition-colors text-base"
+            <Link
+              href="/property/project-odyssey-ahmedabad/"
+              className="mt-2 bg-odyssey-blue hover:bg-azure-deep text-white text-center font-semibold py-3.5 rounded-2xl transition-colors text-base block"
               onClick={() => setOpen(false)}
             >
               {labels.nav.book}
-            </a>
+            </Link>
           </div>
         )}
       </header>
 
       {/* Mobile sticky bottom Book bar */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 p-3 bg-abyss/95 backdrop-blur-md border-t border-white/8 safe-area-inset-bottom">
-        <a
-          href={bookHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full bg-odyssey-blue hover:bg-azure-deep active:bg-azure-core text-white text-center font-semibold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-abyss/95 backdrop-blur-md border-t border-white/8 safe-area-inset-bottom">
+        <Link
+          href="/property/project-odyssey-ahmedabad/"
+          className="flex items-center justify-center gap-2 w-full bg-odyssey-blue hover:bg-azure-deep text-white text-center font-semibold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
         >
           {labels.hero.cta}
-        </a>
+        </Link>
       </div>
     </>
   );

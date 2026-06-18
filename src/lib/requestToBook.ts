@@ -7,6 +7,7 @@ export interface BookingRequest {
   checkOut?: string;
   guests?: number;
   guestName?: string;
+  extraNote?: string;
 }
 
 function formatDate(d: string) {
@@ -46,6 +47,7 @@ export function buildWhatsAppLink(req: BookingRequest): string {
     }
   }
 
+  if (req.extraNote) lines.push(req.extraNote);
   lines.push("Please confirm availability. Thank you!");
 
   const text = encodeURIComponent(lines.join("\n"));

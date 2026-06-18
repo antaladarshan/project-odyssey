@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
   Wifi, Wind, Droplets, Lock, Lamp, Coffee, UtensilsCrossed,
   Users, BedDouble, ChevronDown, ChevronUp, Sparkles, Tag,
@@ -95,7 +96,7 @@ export default function Rooms() {
           <h2 className="font-display font-bold text-3xl sm:text-4xl md:text-5xl text-ice">
             {labels.rooms.heading}
           </h2>
-          <p className="text-sky-tint/70 max-w-lg mx-auto text-sm">
+          <p className="text-sky-tint max-w-lg mx-auto text-sm">
             Every bed has a privacy curtain, reading light, and personal locker. Book by the bed.
           </p>
         </div>
@@ -103,13 +104,13 @@ export default function Rooms() {
         {/* Room cards */}
         <div className="flex flex-col gap-5">
           {rooms.map((room) => {
-            const bookHref = buildWhatsAppLink({ room: `${room.name} (${room.beds}-Bed ${room.bedType})` });
+            const bookHref = `/property/project-odyssey-ahmedabad/`;
             const isOpen = expanded === room.id;
 
             return (
               <div
                 key={room.id}
-                className="rounded-2xl border border-white/8 bg-abyss overflow-hidden"
+                className="rounded-2xl border border-white/8 bg-abyss overflow-hidden shadow-sm"
               >
                 <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]">
                   {/* Room photo */}
@@ -134,7 +135,7 @@ export default function Rooms() {
                   </div>
 
                   {/* Room details */}
-                  <div className="flex flex-col gap-0 divide-y divide-white/5">
+                  <div className="flex flex-col gap-0 divide-y divide-white/8">
                     {/* Main info */}
                     <div className="p-5 flex flex-col gap-3">
                       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -159,10 +160,10 @@ export default function Rooms() {
                         <div className="text-right shrink-0 flex flex-col gap-0.5">
                           <p className="text-2xl font-display font-bold text-ice">
                             ₹{fmt(room.basePricePerBedPerNight)}
-                            <span className="text-sm font-normal text-sky-tint/60 ml-1">/ bed / night</span>
+                            <span className="text-sm font-normal text-sky-tint ml-1">/ bed / night</span>
                           </p>
-                          <p className="text-xs text-sky-tint/60">
-                            or <span className="text-sky-tint font-semibold">₹{fmt(room.wholeRoomPerNight)}</span> for whole room
+                          <p className="text-xs text-sky-tint">
+                            or <span className="text-ice font-semibold">₹{fmt(room.wholeRoomPerNight)}</span> for whole room
                           </p>
                         </div>
                       </div>
@@ -173,7 +174,7 @@ export default function Rooms() {
                           beds={room.beds}
                           className="h-[70px] w-auto opacity-90"
                         />
-                        <p className="text-sm text-sky-tint/80 leading-relaxed flex-1">
+                        <p className="text-sm text-sky-tint leading-relaxed flex-1">
                           {room.description}
                         </p>
                       </div>
@@ -183,7 +184,7 @@ export default function Rooms() {
                         {room.amenities.map((a) => (
                           <span
                             key={a}
-                            className="flex items-center gap-1 text-[11px] bg-white/5 border border-white/8 text-sky-tint px-2.5 py-1 rounded-full"
+                            className="flex items-center gap-1 text-[11px] bg-white/5 border border-white/10 text-sky-tint px-2.5 py-1 rounded-full"
                           >
                             {amenityIcons[a] ?? <Wifi size={12} />}
                             {a}
@@ -193,21 +194,17 @@ export default function Rooms() {
                     </div>
 
                     {/* Discount badges */}
-                    <div className="px-5 pb-3 flex flex-wrap gap-2">
+                    <div className="px-5 pb-3 pt-3 flex flex-wrap gap-2">
                       {PRICING.discounts.map((d) => (
                         <span
                           key={d.minNights}
-                          className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border ${
-                            d.pct >= 50
-                              ? "bg-odyssey-blue/10 border-odyssey-blue/25 text-odyssey-blue"
-                              : "bg-green-400/8 border-green-400/20 text-green-400"
-                          }`}
+                          className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-palm/10 border-palm/25 text-palm"
                         >
                           <Sparkles size={10} />
                           {d.minNights}+ nights: <strong>{d.badge}</strong>
                         </span>
                       ))}
-                      <span className="flex items-center gap-1 text-[11px] text-sky-tint/50">
+                      <span className="flex items-center gap-1 text-[11px] text-sky-tint">
                         <Tag size={10} /> Discounts auto-applied on booking
                       </span>
                     </div>
@@ -223,14 +220,12 @@ export default function Rooms() {
                         {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                       </button>
 
-                      <a
+                      <Link
                         href={bookHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
                         className="flex items-center gap-2 bg-odyssey-blue hover:bg-azure-deep text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-colors"
                       >
                         {labels.rooms.bookCta}
-                      </a>
+                      </Link>
                     </div>
 
                     {/* Expandable availability note */}
@@ -262,44 +257,42 @@ export default function Rooms() {
         </div>
 
         {/* Pricing tiers summary */}
-        <div className="mt-8 rounded-2xl border border-white/8 bg-abyss overflow-hidden">
-          <div className="px-5 py-4 border-b border-white/6 flex items-center gap-2">
+        <div className="mt-8 rounded-2xl border border-white/8 bg-abyss overflow-hidden shadow-sm">
+          <div className="px-5 py-4 border-b border-white/8 flex items-center gap-2">
             <Tag size={15} className="text-odyssey-blue" />
             <span className="text-sm font-semibold text-ice">Pricing & Discounts</span>
-            <span className="ml-auto text-xs text-sky-tint/50">Auto-applied when you book via WhatsApp</span>
+            <span className="ml-auto text-xs text-sky-tint">Per night drops every added night</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/8">
             {/* Per bed */}
             <div className="p-5 flex flex-col gap-1">
-              <p className="text-xs text-sky-tint/60 uppercase tracking-wider">Per Bed</p>
-              <p className="text-2xl font-display font-bold text-ice">₹{fmt(PRICING.perBedPerNight)}</p>
-              <p className="text-xs text-sky-tint/60">per night, any room</p>
+              <p className="text-xs text-sky-tint uppercase tracking-wider">1 Night</p>
+              <p className="text-2xl font-display font-bold text-ice">₹700</p>
+              <p className="text-xs text-sky-tint">rack rate</p>
             </div>
-            {/* 4-bed whole room */}
+            {/* 7 nights */}
             <div className="p-5 flex flex-col gap-1">
-              <p className="text-xs text-sky-tint/60 uppercase tracking-wider">4-Bed Private</p>
-              <p className="text-2xl font-display font-bold text-ice">₹{fmt(PRICING.wholeRoom4Bed)}</p>
-              <p className="text-xs text-sky-tint/60">whole room / night</p>
-            </div>
-            {/* 7-day discount */}
-            <div className="p-5 flex flex-col gap-1 border-t sm:border-t-0 border-white/6">
-              <p className="text-xs text-green-400/80 uppercase tracking-wider flex items-center gap-1">
-                <Sparkles size={10} /> Weekly Stay (7+ nights)
+              <p className="text-xs text-green-400 uppercase tracking-wider flex items-center gap-1">
+                <Sparkles size={10} /> 7 Nights
               </p>
-              <p className="text-2xl font-display font-bold text-green-400">15% off</p>
-              <p className="text-xs text-sky-tint/60">
-                ₹{fmt(Math.round(PRICING.perBedPerNight * 0.85))}/bed/night
-              </p>
+              <p className="text-2xl font-display font-bold text-green-400">₹499<span className="text-sm font-normal text-sky-tint ml-1">~29% off</span></p>
+              <p className="text-xs text-sky-tint">per bed / night</p>
             </div>
-            {/* Monthly discount */}
-            <div className="p-5 flex flex-col gap-1 bg-odyssey-blue/5 border-t sm:border-t-0 border-white/6">
+            {/* 14 nights */}
+            <div className="p-5 flex flex-col gap-1">
               <p className="text-xs text-odyssey-blue uppercase tracking-wider flex items-center gap-1">
-                <Sparkles size={10} /> Monthly Stay (30+ nights)
+                <Sparkles size={10} /> 14 Nights
               </p>
-              <p className="text-2xl font-display font-bold text-odyssey-blue">60% off</p>
-              <p className="text-xs text-sky-tint/60">
-                just ₹{fmt(Math.round(PRICING.perBedPerNight * 0.40))}/bed/night
+              <p className="text-2xl font-display font-bold text-odyssey-blue">₹399<span className="text-sm font-normal text-sky-tint ml-1">~43% off</span></p>
+              <p className="text-xs text-sky-tint">per bed / night</p>
+            </div>
+            {/* Monthly */}
+            <div className="p-5 flex flex-col gap-1 bg-odyssey-blue/5">
+              <p className="text-xs text-mascot-glow uppercase tracking-wider flex items-center gap-1">
+                <Sparkles size={10} /> 30+ Nights
               </p>
+              <p className="text-2xl font-display font-bold text-mascot-glow">₹299<span className="text-sm font-normal text-sky-tint ml-1">~57% off</span></p>
+              <p className="text-xs text-sky-tint">+ WORKATION extra 15%</p>
             </div>
           </div>
         </div>
@@ -316,7 +309,7 @@ export default function Rooms() {
             href={buildWhatsAppLink({ room: "Group booking — full room" })}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 text-xs font-semibold text-odyssey-blue hover:text-ice border border-odyssey-blue/40 hover:bg-odyssey-blue px-5 py-2.5 rounded-full transition-all whitespace-nowrap"
+            className="shrink-0 text-xs font-semibold text-odyssey-blue hover:text-white border border-odyssey-blue/40 hover:bg-odyssey-blue px-5 py-2.5 rounded-full transition-all whitespace-nowrap"
           >
             Block a Room for My Group
           </a>

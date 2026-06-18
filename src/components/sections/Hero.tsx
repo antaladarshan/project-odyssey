@@ -68,7 +68,7 @@ export default function Hero() {
 
       <div className="relative z-20 w-full max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center text-center gap-6 sm:gap-8 pt-20 sm:pt-24 pb-28 sm:pb-32">
 
-        {/* Mascot — transparent PNG, naturally floats on dark bg */}
+        {/* Mascot */}
         <div
           ref={mascotRef}
           className="transition-transform duration-200 ease-out animate-[float_4s_ease-in-out_infinite]"
