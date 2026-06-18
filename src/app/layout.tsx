@@ -23,9 +23,8 @@ const bricolage = Bricolage_Grotesque({
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   icons: {
-    icon: "/brand/mascot.png",
-    shortcut: "/brand/mascot.png",
-    apple: "/brand/mascot.png",
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/icon.png", type: "image/png" }],
   },
   title: {
     default: `${siteConfig.name} — ${siteConfig.tagline}`,
