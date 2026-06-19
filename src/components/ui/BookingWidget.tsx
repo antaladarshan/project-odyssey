@@ -61,7 +61,7 @@ export default function BookingWidget({ className = "" }: { className?: string }
   return (
     <form
       onSubmit={handleBook}
-      className={`bg-ink/85 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl ${className}`}
+      className={`relative z-30 bg-ink/85 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl ${className}`}
     >
       <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
         {/* Date range trigger + popover */}
