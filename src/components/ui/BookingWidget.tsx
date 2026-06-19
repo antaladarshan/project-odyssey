@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, Users, ArrowRight, Sparkles } from "lucide-react";
@@ -9,6 +10,8 @@ import { calcBedTotal, nightsBetween, effectiveNightly } from "@/lib/pricing";
 import DateRangePicker from "@/components/booking/DateRangePicker";
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
+const POPOVER_W = 340;
+const POPOVER_H = 470; // estimate used before the popover has measured its real height
 
 function fmtDate(iso: string): string {
   if (!iso) return "";
@@ -21,19 +24,57 @@ export default function BookingWidget({ className = "" }: { className?: string }
   const [checkOut, setCheckOut] = useState("");
   const [beds, setBeds] = useState(1);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [coords, setCoords] = useState({ top: 0, left: 0, width: POPOVER_W });
   const router = useRouter();
-  const pickerRef = useRef<HTMLDivElement>(null);
+
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
 
   const today = new Date().toISOString().split("T")[0];
   const nights = nightsBetween(checkIn, checkOut);
   const perNight = nights > 0 ? effectiveNightly(nights) : 700;
   const pricing = nights > 0 ? calcBedTotal(nights, beds) : null;
 
-  // Close popover on outside-click or Escape
+  useEffect(() => setMounted(true), []);
+
+  // Position the portal popover, flipping above the trigger when there isn't
+  // enough room below, and clamping into the viewport as a last resort.
+  useLayoutEffect(() => {
+    if (!open) return;
+    function place() {
+      const t = triggerRef.current?.getBoundingClientRect();
+      if (!t) return;
+      const popH = popRef.current?.offsetHeight || POPOVER_H;
+      const width = Math.min(POPOVER_W, window.innerWidth - 16);
+      const left = Math.max(8, Math.min(t.left, window.innerWidth - width - 8));
+      const spaceBelow = window.innerHeight - t.bottom;
+      const spaceAbove = t.top;
+      let top: number;
+      if (spaceBelow >= popH + 12) top = t.bottom + 8; // open downward
+      else if (spaceAbove >= popH + 12) top = t.top - popH - 8; // flip upward
+      else top = Math.max(8, window.innerHeight - popH - 8); // clamp into view
+      setCoords({ top, left, width });
+    }
+    place();
+    const raf = requestAnimationFrame(place); // re-measure with real height
+    window.addEventListener("scroll", place, true);
+    window.addEventListener("resize", place);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", place, true);
+      window.removeEventListener("resize", place);
+    };
+  }, [open]);
+
+  // Close on outside-click (trigger or popover) or Escape.
   useEffect(() => {
     if (!open) return;
     function onDown(e: MouseEvent) {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      if (triggerRef.current?.contains(target)) return;
+      if (popRef.current?.contains(target)) return;
+      setOpen(false);
     }
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") setOpen(false);
@@ -64,12 +105,13 @@ export default function BookingWidget({ className = "" }: { className?: string }
       className={`relative z-30 bg-ink/85 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl ${className}`}
     >
       <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
-        {/* Date range trigger + popover */}
-        <div className="flex-1 min-w-0 relative" ref={pickerRef}>
+        {/* Date range trigger (popover rendered via portal below) */}
+        <div className="flex-1 min-w-0">
           <label className="flex items-center gap-1 text-xs text-sky-tint font-medium mb-1.5">
             <Calendar size={11} /> Check In — Check Out
           </label>
           <button
+            ref={triggerRef}
             type="button"
             onClick={() => setOpen((o) => !o)}
             className={`${inputCls} flex items-center justify-between text-left ${
@@ -87,28 +129,6 @@ export default function BookingWidget({ className = "" }: { className?: string }
             )}
             <Calendar size={14} className="text-sky-tint shrink-0 ml-2" />
           </button>
-
-          <AnimatePresence>
-            {open && (
-              <motion.div
-                initial={{ opacity: 0, y: -8, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-                className="absolute z-50 mt-2 left-0 right-0 sm:right-auto origin-top"
-              >
-                <DateRangePicker
-                  value={{ checkIn, checkOut }}
-                  minDate={today}
-                  onApply={({ checkIn: ci, checkOut: co }) => {
-                    setCheckIn(ci);
-                    setCheckOut(co);
-                  }}
-                  onClose={() => setOpen(false)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         {/* Beds */}
@@ -164,6 +184,43 @@ export default function BookingWidget({ className = "" }: { className?: string }
           </span>
         </div>
       )}
+
+      {/* Calendar popover — portaled to <body> so the hero's overflow-hidden can't clip it */}
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {open && (
+              <motion.div
+                ref={popRef}
+                initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.18, ease: "easeOut" }}
+                style={{
+                  position: "fixed",
+                  top: coords.top,
+                  left: coords.left,
+                  width: coords.width,
+                  maxHeight: "calc(100dvh - 16px)",
+                  overflowY: "auto",
+                  zIndex: 60,
+                }}
+                className="origin-top"
+              >
+                <DateRangePicker
+                  value={{ checkIn, checkOut }}
+                  minDate={today}
+                  onApply={({ checkIn: ci, checkOut: co }) => {
+                    setCheckIn(ci);
+                    setCheckOut(co);
+                  }}
+                  onClose={() => setOpen(false)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </form>
   );
 }
