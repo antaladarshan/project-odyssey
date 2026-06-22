@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   Wifi, Wind, Droplets, Lock, Lamp, Coffee, UtensilsCrossed,
@@ -38,6 +38,19 @@ export default function PropertyDetail({ property }: Props) {
 
   const [search, setSearch] = useState<DateSearch>({ checkIn: today, checkOut: tomorrow, guests: 1 });
   const [searched, setSearched] = useState(true);
+
+  // Carry over the selection made on the homepage hero (passed as URL params),
+  // so the guest doesn't have to re-pick the same dates here. Read in an effect
+  // (not at render) so the URL is reliably committed after client-side navigation.
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const ci = p.get("checkIn");
+    const co = p.get("checkOut");
+    const g = Number(p.get("guests"));
+    if (ci && co) {
+      setSearch({ checkIn: ci, checkOut: co, guests: g >= 1 ? g : 1 });
+    }
+  }, []);
   const [selected, setSelected] = useState<SelectedRoom[]>([]);
   const [workation, setWorkation] = useState(false);
   const [reviewing, setReviewing] = useState(false);

@@ -33,6 +33,14 @@ export default function DateSearchBar({ onSearch, initial = {} }: Props) {
 
   const pickerRef = useRef<HTMLDivElement>(null);
 
+  // Keep the fields in sync when the parent updates the initial selection
+  // (e.g. dates carried over from the homepage after mount).
+  useEffect(() => {
+    if (initial.checkIn) setCheckIn(initial.checkIn);
+    if (initial.checkOut) setCheckOut(initial.checkOut);
+    if (initial.guests) setGuests(initial.guests);
+  }, [initial.checkIn, initial.checkOut, initial.guests]);
+
   // Close popover on outside-click or Escape
   useEffect(() => {
     if (!open) return;
