@@ -1,9 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Bricolage_Grotesque } from "next/font/google";
-import { ThemeProvider } from "next-themes";
-import Nav from "@/components/layout/Nav";
-import Footer from "@/components/layout/Footer";
-import SmoothScrollProvider from "@/components/layout/SmoothScrollProvider";
+import { Inter, Bricolage_Grotesque, Newsreader, IBM_Plex_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import "./globals.css";
 
@@ -18,6 +14,19 @@ const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
   display: "swap",
   weight: ["400", "500", "600", "700", "800"],
+});
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ["latin"],
+  variable: "--font-ibm-plex-mono",
+  display: "swap",
+  weight: ["400", "500"],
 });
 
 export const metadata: Metadata = {
@@ -94,7 +103,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${bricolage.variable} h-full scroll-smooth`}
+      className={`${inter.variable} ${bricolage.variable} ${newsreader.variable} ${ibmPlexMono.variable} h-full scroll-smooth`}
     >
       <head>
         <script
@@ -102,14 +111,8 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingSchema) }}
         />
       </head>
-      <body className="min-h-full flex flex-col antialiased">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <SmoothScrollProvider>
-            <Nav />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </SmoothScrollProvider>
-        </ThemeProvider>
+      <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>
+        {children}
       </body>
     </html>
   );
