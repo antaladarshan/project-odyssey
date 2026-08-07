@@ -9,22 +9,23 @@ import { GreekKeyDivider } from "@/components/ui/GreekKeyDivider";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    setStatus("sending");
+    setStatus("loading");
 
     const redirectTo = new URLSearchParams(window.location.search).get("redirectTo") ?? "/calendar";
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}`,
-      },
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-    setStatus(error ? "error" : "sent");
+    if (error) {
+      setStatus("error");
+      return;
+    }
+
+    window.location.assign(redirectTo);
   }
 
   return (
@@ -53,30 +54,34 @@ export default function LoginPage() {
             Sign in to manage bookings.
           </p>
 
-          {status === "sent" ? (
-            <p className="mt-6 rounded-lg bg-olive/10 px-4 py-3 text-sm text-olive">
-              Check your inbox for a sign-in link.
-            </p>
-          ) : (
-            <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
-              <Input
-                id="email"
-                label="Email"
-                type="email"
-                required
-                autoComplete="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@projectodyssey.in"
-              />
-              <Button type="submit" disabled={status === "sending"}>
-                {status === "sending" ? "Sending…" : "Send magic link"}
-              </Button>
-              {status === "error" && (
-                <p className="text-sm text-oxide">Something went wrong. Try again.</p>
-              )}
-            </form>
-          )}
+          <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
+            <Input
+              id="email"
+              label="Email"
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@projectodyssey.in"
+            />
+            <Input
+              id="password"
+              label="Password"
+              type="password"
+              required
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+            />
+            <Button type="submit" disabled={status === "loading"}>
+              {status === "loading" ? "Signing in…" : "Sign in"}
+            </Button>
+            {status === "error" && (
+              <p className="text-sm text-oxide">Incorrect email or password.</p>
+            )}
+          </form>
         </div>
 
         <GreekKeyDivider className="mt-6 text-ink-navy" />
