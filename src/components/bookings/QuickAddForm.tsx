@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState } from "react";
 import { createBookingAction, type QuickAddFormState } from "@/lib/actions/bookings";
 import { RoomBedPicker } from "./RoomBedPicker";
+import { DateRangeField } from "./DateRangeField";
 import { ChannelPicker } from "./ChannelPicker";
 import { GuestPicker } from "@/components/guests/GuestPicker";
 import { Input } from "@/components/ui/Input";
@@ -78,29 +79,15 @@ export function QuickAddForm({
         error={state.fieldErrors?.room_bed_id?.[0] ?? conflictWarning}
       />
 
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          id="checkin_date"
-          name="checkin_date"
-          type="date"
-          label="Check-in"
-          required
-          value={checkinDate}
-          onChange={(e) => setCheckinDate(e.target.value)}
-        />
-        <Input
-          id="checkout_date"
-          name="checkout_date"
-          type="date"
-          label="Check-out"
-          required
-          value={checkoutDate}
-          onChange={(e) => setCheckoutDate(e.target.value)}
-        />
-      </div>
-      {state.fieldErrors?.checkout_date && (
-        <p className="-mt-3 text-sm text-oxide">{state.fieldErrors.checkout_date[0]}</p>
-      )}
+      <DateRangeField
+        checkinDate={checkinDate}
+        checkoutDate={checkoutDate}
+        error={state.fieldErrors?.checkout_date?.[0]}
+        onDatesChange={(ci, co) => {
+          setCheckinDate(ci);
+          setCheckoutDate(co);
+        }}
+      />
 
       <ChannelPicker channels={channels} error={state.fieldErrors?.channel_id?.[0]} />
 
