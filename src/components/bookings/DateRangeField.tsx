@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import { addDays, parseISODate, toISODate } from "@/lib/dates";
+import { addDays, formatShortDate, parseISODate, toISODate } from "@/lib/dates";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const MONTHS = [
@@ -29,17 +29,18 @@ const DURATION_PRESETS = [
   { label: "1 Year", months: 12 },
 ];
 
-function fmtShort(iso: string): string {
-  return parseISODate(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
-}
-
 export interface DateRangeFieldProps {
   checkinDate: string;
   checkoutDate: string;
   error?: string;
+  /** Fired whenever the (possibly still-incomplete) selection changes — lets
+   *  a parent mirror the dates for its own purposes (e.g. a live availability
+   *  check) without becoming the source of truth for the submitted form
+   *  fields, which stay owned by this component's hidden inputs. */
+  onDatesChange?: (checkIn: string, checkOut: string) => void;
 }
 
-export function DateRangeField({ checkinDate, checkoutDate, error }: DateRangeFieldProps) {
+export function DateRangeField({ checkinDate, checkoutDate, error, onDatesChange }: DateRangeFieldProps) {
   const [checkIn, setCheckIn] = useState(checkinDate);
   const [checkOut, setCheckOut] = useState(checkoutDate);
   const [open, setOpen] = useState(false);
@@ -58,11 +59,14 @@ export function DateRangeField({ checkinDate, checkoutDate, error }: DateRangeFi
     if (!checkIn || checkOut) {
       setCheckIn(iso);
       setCheckOut("");
+      onDatesChange?.(iso, "");
     } else if (iso > checkIn) {
       setCheckOut(iso);
+      onDatesChange?.(checkIn, iso);
     } else {
       setCheckIn(iso);
       setCheckOut("");
+      onDatesChange?.(iso, "");
     }
   }
 
@@ -73,6 +77,7 @@ export function DateRangeField({ checkinDate, checkoutDate, error }: DateRangeFi
     const newCheckOut = toISODate(addMonths(parseISODate(checkIn), months));
     setCheckOut(newCheckOut);
     setViewMonth(startOfMonth(parseISODate(newCheckOut)));
+    onDatesChange?.(checkIn, newCheckOut);
   }
 
   return (
@@ -86,9 +91,9 @@ export function DateRangeField({ checkinDate, checkoutDate, error }: DateRangeFi
         }`}
       >
         <span>
-          {checkIn ? fmtShort(checkIn) : "Check-in"}
+          {checkIn ? formatShortDate(checkIn) : "Check-in"}
           <span className="mx-2 text-charcoal/40">→</span>
-          {checkOut ? fmtShort(checkOut) : "Check-out"}
+          {checkOut ? formatShortDate(checkOut) : "Check-out"}
         </span>
         <Calendar size={15} className="shrink-0 text-charcoal/50" />
       </button>

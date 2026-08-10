@@ -32,6 +32,10 @@ export function dateRange(start: Date, days: number): Date[] {
   return Array.from({ length: days }, (_, i) => addDays(start, i));
 }
 
+export function formatShortDate(iso: string): string {
+  return parseISODate(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
+
 export function formatDateHeader(date: Date): { weekday: string; day: string; month: string } {
   return {
     weekday: date.toLocaleDateString("en-IN", { weekday: "short" }),
