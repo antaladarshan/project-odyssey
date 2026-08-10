@@ -74,7 +74,10 @@ export function GuestPicker({ guests, errors }: GuestPickerProps) {
           Existing guest{selected.phone ? ` · ${selected.phone}` : ""}
         </p>
       ) : (
-        <Input label="Phone (optional)" name="guest_phone" type="tel" placeholder="+91…" />
+        <div className="grid grid-cols-2 gap-3">
+          <Input label="Phone (optional)" name="guest_phone" type="tel" placeholder="+91…" />
+          <Input label="Email (optional)" name="guest_email" type="email" placeholder="guest@email.com" />
+        </div>
       )}
     </div>
   );

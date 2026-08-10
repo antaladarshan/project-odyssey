@@ -27,7 +27,11 @@ export async function createBookingAction(
   let guestId = input.guest_id;
   const createdNewGuest = !guestId;
   if (!guestId) {
-    const newGuest = guestSchema.safeParse({ name: input.guest_name, phone: input.guest_phone });
+    const newGuest = guestSchema.safeParse({
+      name: input.guest_name,
+      phone: input.guest_phone,
+      email: input.guest_email,
+    });
     if (!newGuest.success) {
       return { fieldErrors: newGuest.error.flatten().fieldErrors };
     }

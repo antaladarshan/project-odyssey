@@ -30,6 +30,11 @@ export const quickAddBookingSchema = z
       .trim()
       .optional()
       .transform((v) => (v ? v : undefined)),
+    guest_email: z
+      .string()
+      .trim()
+      .optional()
+      .transform((v) => (v ? v : undefined)),
     rate_total: optionalMoney,
     amount_paid: optionalMoney,
     note: z
