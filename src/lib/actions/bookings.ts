@@ -104,8 +104,11 @@ export interface EditBookingFormState {
   fieldErrors?: Record<string, string[]>;
 }
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export async function updateBookingDetailsAction(
   bookingId: string,
+  guestId: string,
   _prevState: EditBookingFormState,
   formData: FormData
 ): Promise<EditBookingFormState> {
@@ -115,6 +118,8 @@ export async function updateBookingDetailsAction(
   const roomBedId = String(formData.get("room_bed_id") ?? "").trim();
   const checkinDate = String(formData.get("checkin_date") ?? "").trim();
   const checkoutDate = String(formData.get("checkout_date") ?? "").trim();
+  const guestPhone = String(formData.get("guest_phone") ?? "").trim();
+  const guestEmail = String(formData.get("guest_email") ?? "").trim();
 
   const rateTotal = rateTotalRaw ? Number(rateTotalRaw) : null;
   const amountPaid = amountPaidRaw ? Number(amountPaidRaw) : 0;
@@ -134,8 +139,21 @@ export async function updateBookingDetailsAction(
   if (checkoutDate <= checkinDate) {
     return { fieldErrors: { checkout_date: ["Check-out must be after check-in"] } };
   }
+  if (guestEmail && !EMAIL_RE.test(guestEmail)) {
+    return { fieldErrors: { guest_email: ["Enter a valid email"] } };
+  }
 
   const supabase = await createClient();
+
+  const { error: guestError } = await supabase
+    .from("guests")
+    .update({ phone: guestPhone || null, email: guestEmail || null })
+    .eq("id", guestId);
+
+  if (guestError) {
+    return { error: "Could not save guest contact details." };
+  }
+
   const { error } = await supabase
     .from("bookings")
     .update({
@@ -156,6 +174,7 @@ export async function updateBookingDetailsAction(
   }
 
   revalidatePath("/calendar");
+  revalidatePath("/guests");
   revalidatePath(`/bookings/${bookingId}`);
   return {};
 }

@@ -12,6 +12,7 @@ import type { BedAvailabilityResponse } from "@/app/api/bookings/bed-availabilit
 
 export interface EditBookingDetailsProps {
   bookingId: string;
+  guestId: string;
   roomTypes: { id: string; name: string }[];
   roomsBeds: { id: string; room_type_id: string; label: string }[];
   currentRoomBedId: string;
@@ -20,12 +21,15 @@ export interface EditBookingDetailsProps {
   rateTotal: number | null;
   amountPaid: number;
   note: string | null;
+  guestPhone: string | null;
+  guestEmail: string | null;
 }
 
 const initialState: EditBookingFormState = {};
 
 export function EditBookingDetails({
   bookingId,
+  guestId,
   roomTypes,
   roomsBeds,
   currentRoomBedId,
@@ -34,8 +38,10 @@ export function EditBookingDetails({
   rateTotal,
   amountPaid,
   note,
+  guestPhone,
+  guestEmail,
 }: EditBookingDetailsProps) {
-  const action = updateBookingDetailsAction.bind(null, bookingId);
+  const action = updateBookingDetailsAction.bind(null, bookingId, guestId);
   const [state, formAction, isPending] = useActionState(action, initialState);
 
   const [checkIn, setCheckIn] = useState(checkinDate);
@@ -90,6 +96,27 @@ export function EditBookingDetails({
           setCheckOut(co);
         }}
       />
+      <div className="grid grid-cols-2 gap-3">
+        <Input
+          id="guest_phone"
+          name="guest_phone"
+          type="tel"
+          label="Guest phone"
+          placeholder="+91…"
+          defaultValue={guestPhone ?? ""}
+        />
+        <Input
+          id="guest_email"
+          name="guest_email"
+          type="email"
+          label="Guest email"
+          placeholder="guest@email.com"
+          defaultValue={guestEmail ?? ""}
+        />
+      </div>
+      {state.fieldErrors?.guest_email && (
+        <p className="text-sm text-oxide">{state.fieldErrors.guest_email[0]}</p>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <Input
           id="rate_total"

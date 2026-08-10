@@ -111,6 +111,7 @@ export default async function BookingDetailPage({
         <h2 className="mb-3 font-serif text-lg text-ink-navy">Edit details</h2>
         <EditBookingDetails
           bookingId={booking.id}
+          guestId={booking.guest_id}
           roomTypes={roomTypes ?? []}
           roomsBeds={roomsBeds ?? []}
           currentRoomBedId={booking.room_bed_id}
@@ -119,6 +120,8 @@ export default async function BookingDetailPage({
           rateTotal={booking.rate_total}
           amountPaid={booking.amount_paid}
           note={booking.note}
+          guestPhone={guest?.phone ?? null}
+          guestEmail={guest?.email ?? null}
         />
       </div>
     </div>
