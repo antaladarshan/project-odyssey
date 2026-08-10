@@ -38,6 +38,7 @@ interface Props {
 
 function RoomCard({
   room,
+  displayName,
   nights,
   qty,
   bedsAvailable,
@@ -45,6 +46,7 @@ function RoomCard({
   onQtyChange,
 }: {
   room: Room;
+  displayName: string;
   nights: number;
   qty: number;
   bedsAvailable: number;
@@ -67,7 +69,7 @@ function RoomCard({
       <div className="relative w-full sm:w-48 h-44 sm:h-auto shrink-0 overflow-hidden bg-abyss">
         <Image
           src={room.images[0]}
-          alt={room.name}
+          alt={displayName}
           fill
           className="object-cover"
           sizes="(max-width: 640px) 100vw, 192px"
@@ -91,7 +93,7 @@ function RoomCard({
         {/* Header row */}
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
-            <h3 className="font-display font-bold text-lg text-ice">{room.name}</h3>
+            <h3 className="font-display font-bold text-lg text-ice">{displayName}</h3>
             <div className="flex items-center gap-2 text-xs text-sky-tint mt-0.5">
               <span className="flex items-center gap-1">
                 <Users size={11} /> {room.capacity} Guests
@@ -212,7 +214,13 @@ export default function AvailabilityList({ nights, selected, onChange, liveAvail
   }
 
   function getAvailability(room: Room): RoomTypeAvailability {
-    return liveAvailability?.[room.roomTypeName] ?? { available: room.bedsAvailable, nextFreeDate: null };
+    return (
+      liveAvailability?.[room.roomTypeId] ?? {
+        name: room.name,
+        available: room.bedsAvailable,
+        nextFreeDate: null,
+      }
+    );
   }
 
   function handleQtyChange(room: Room, delta: number) {
@@ -233,11 +241,12 @@ export default function AvailabilityList({ nights, selected, onChange, liveAvail
   return (
     <div className="flex flex-col gap-4">
       {rooms.map((room) => {
-        const { available, nextFreeDate } = getAvailability(room);
+        const { name: displayName, available, nextFreeDate } = getAvailability(room);
         return (
           <RoomCard
             key={room.id}
             room={room}
+            displayName={displayName}
             nights={nights}
             qty={getQty(room.id)}
             bedsAvailable={available}

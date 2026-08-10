@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
 
 export interface RoomTypeAvailability {
+  name: string;
   available: number;
   nextFreeDate: string | null;
 }
@@ -69,7 +70,9 @@ export async function GET(request: NextRequest) {
       }, null);
     }
 
-    availability[roomType.name] = { available: freeBeds.length, nextFreeDate };
+    // Keyed by id (stable) rather than name (renameable in the PMS) — the
+    // current name travels in the value so the site always reflects it.
+    availability[roomType.id] = { name: roomType.name, available: freeBeds.length, nextFreeDate };
   }
 
   return NextResponse.json({ availability });

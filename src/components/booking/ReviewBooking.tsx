@@ -6,6 +6,7 @@ import { rooms } from "@/config/property";
 import { calcRoomPricing, calcBilling, WORKATION_MIN_NIGHTS, ODYSSEY_PRICING_CONFIG } from "@/lib/pricing";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
 import type { SelectedRoom } from "./AvailabilityList";
+import type { RoomTypeAvailability } from "@/app/api/availability/route";
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
 
@@ -17,6 +18,7 @@ interface Props {
   workation: boolean;
   onWorkationToggle: (v: boolean) => void;
   onBack: () => void;
+  liveAvailability?: Record<string, RoomTypeAvailability> | null;
 }
 
 export default function ReviewBooking({
@@ -27,6 +29,7 @@ export default function ReviewBooking({
   workation,
   onWorkationToggle,
   onBack,
+  liveAvailability,
 }: Props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -37,11 +40,13 @@ export default function ReviewBooking({
     .map((s) => {
       const room = rooms.find((r) => r.id === s.roomId);
       if (!room) return null;
+      const roomName = liveAvailability?.[room.roomTypeId]?.name ?? room.name;
       const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, s.qty, room.basePricePerBedPerNight, ODYSSEY_PRICING_CONFIG);
-      return { room, qty: s.qty, perNight, pctOff, roomCharges };
+      return { room, roomName, qty: s.qty, perNight, pctOff, roomCharges };
     })
     .filter(Boolean) as Array<{
     room: (typeof rooms)[0];
+    roomName: string;
     qty: number;
     perNight: number;
     pctOff: number;
@@ -58,7 +63,7 @@ export default function ReviewBooking({
   function handleBook(e: React.FormEvent) {
     e.preventDefault();
     const roomSummary = lineItems
-      .map((l) => `${l.room.name} ×${l.qty} (₹${fmt(l.perNight)}/night × ${nights}n = ₹${fmt(l.roomCharges)})`)
+      .map((l) => `${l.roomName} ×${l.qty} (₹${fmt(l.perNight)}/night × ${nights}n = ₹${fmt(l.roomCharges)})`)
       .join(", ");
 
     const href = buildWhatsAppLink({
@@ -235,10 +240,10 @@ export default function ReviewBooking({
           </div>
 
           {/* Room lines */}
-          {lineItems.map(({ room, qty, perNight, pctOff, roomCharges }) => (
+          {lineItems.map(({ room, roomName, qty, perNight, pctOff, roomCharges }) => (
             <div key={room.id} className="border-t border-white/10 pt-3">
               <div className="flex justify-between">
-                <p className="font-semibold text-ice">{room.name}</p>
+                <p className="font-semibold text-ice">{roomName}</p>
                 <p className="text-xs text-sky-tint line-through">
                   ₹{fmt(room.basePricePerBedPerNight * nights * qty)}
                 </p>

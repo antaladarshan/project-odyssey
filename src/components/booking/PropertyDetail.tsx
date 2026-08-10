@@ -79,7 +79,7 @@ export default function PropertyDetail({ property }: Props) {
   }, [search.checkIn, search.checkOut]);
 
   const availableRoomCount = rooms.filter((r) => {
-    const live = liveAvailability?.[r.roomTypeName];
+    const live = liveAvailability?.[r.roomTypeId];
     return (live ? live.available : r.bedsAvailable) > 0;
   }).length;
 
@@ -113,6 +113,7 @@ export default function PropertyDetail({ property }: Props) {
           workation={workation}
           onWorkationToggle={setWorkation}
           onBack={() => setReviewing(false)}
+          liveAvailability={liveAvailability}
         />
       </div>
     );
@@ -291,6 +292,7 @@ export default function PropertyDetail({ property }: Props) {
               workation={workation}
               onWorkationToggle={setWorkation}
               onReview={() => setReviewing(true)}
+              liveAvailability={liveAvailability}
             />
           </div>
         </div>

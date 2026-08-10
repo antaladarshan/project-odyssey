@@ -4,6 +4,7 @@ import { Tag } from "lucide-react";
 import { rooms } from "@/config/property";
 import { calcRoomPricing, calcBilling, WORKATION_MIN_NIGHTS, ODYSSEY_PRICING_CONFIG } from "@/lib/pricing";
 import type { SelectedRoom } from "./AvailabilityList";
+import type { RoomTypeAvailability } from "@/app/api/availability/route";
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
 
@@ -15,6 +16,7 @@ interface Props {
   workation: boolean;
   onWorkationToggle: (v: boolean) => void;
   onReview: () => void;
+  liveAvailability?: Record<string, RoomTypeAvailability> | null;
 }
 
 export default function BookingSummary({
@@ -25,6 +27,7 @@ export default function BookingSummary({
   workation,
   onWorkationToggle,
   onReview,
+  liveAvailability,
 }: Props) {
   const hasSelection = selected.length > 0 && nights > 0;
 
@@ -32,11 +35,13 @@ export default function BookingSummary({
     .map((s) => {
       const room = rooms.find((r) => r.id === s.roomId);
       if (!room) return null;
+      const name = liveAvailability?.[room.roomTypeId]?.name ?? room.name;
       const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, s.qty, room.basePricePerBedPerNight, ODYSSEY_PRICING_CONFIG);
-      return { room, qty: s.qty, perNight, pctOff, roomCharges };
+      return { room, name, qty: s.qty, perNight, pctOff, roomCharges };
     })
     .filter(Boolean) as Array<{
     room: (typeof rooms)[0];
+    name: string;
     qty: number;
     perNight: number;
     pctOff: number;
@@ -86,11 +91,11 @@ export default function BookingSummary({
           <>
             {/* Room line items */}
             <div className="flex flex-col gap-2">
-              {lineItems.map(({ room, qty, perNight, pctOff, roomCharges }) => (
+              {lineItems.map(({ room, name, qty, perNight, pctOff, roomCharges }) => (
                 <div key={room.id} className="flex flex-col gap-0.5">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-ice">{room.name}</p>
+                      <p className="text-sm font-semibold text-ice">{name}</p>
                       <p className="text-xs text-sky-tint">
                         ₹{fmt(perNight)}/night × {qty} {qty === 1 ? "Bed" : "Beds"}
                         {pctOff > 0 && (
