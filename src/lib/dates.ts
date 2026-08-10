@@ -48,6 +48,27 @@ export function isSameDate(a: Date, b: Date): boolean {
   return toISODate(a) === toISODate(b);
 }
 
+/** Calendar-accurate months + remaining days between two ISO dates — e.g.
+ *  10 Jul → 10 Jan is exactly "6 months", not a nights/30 approximation. */
+export function monthsAndDaysBetween(checkin: string, checkout: string): { months: number; days: number } {
+  const start = parseISODate(checkin);
+  const end = parseISODate(checkout);
+  let months = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+  let days = end.getDate() - start.getDate();
+  if (days < 0) {
+    months -= 1;
+    days += new Date(end.getFullYear(), end.getMonth(), 0).getDate(); // days in the month before end
+  }
+  return { months, days };
+}
+
+export function formatMonthsDays(months: number, days: number): string {
+  const parts: string[] = [];
+  if (months > 0) parts.push(`${months} month${months !== 1 ? "s" : ""}`);
+  if (days > 0 || months === 0) parts.push(`${days} day${days !== 1 ? "s" : ""}`);
+  return parts.join(" ");
+}
+
 /** 1-based grid-column start/end (exclusive end) for a booking's date span,
  * clamped to the visible window. */
 export function gridColumnForStay(

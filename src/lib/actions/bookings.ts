@@ -25,6 +25,7 @@ export async function createBookingAction(
   const supabase = await createClient();
 
   let guestId = input.guest_id;
+  const createdNewGuest = !guestId;
   if (!guestId) {
     const newGuest = guestSchema.safeParse({ name: input.guest_name, phone: input.guest_phone });
     if (!newGuest.success) {
@@ -59,6 +60,13 @@ export async function createBookingAction(
     .single();
 
   if (bookingError || !booking) {
+    // Don't leave an orphaned, booking-less guest behind when the booking
+    // write fails right after we created a new guest for it (e.g. a bed
+    // conflict) — otherwise they'd sit in the Guests list forever with "No
+    // stays yet" and no way to retry without re-entering their details.
+    if (createdNewGuest) {
+      await supabase.from("guests").delete().eq("id", guestId);
+    }
     if (bookingError?.code === "23P01") {
       return { error: "That room/bed is already booked for an overlapping date range." };
     }

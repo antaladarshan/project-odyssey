@@ -7,7 +7,7 @@ import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
 import { BookingActions } from "@/components/bookings/BookingActions";
 import { EditBookingDetails } from "@/components/bookings/EditBookingDetails";
 import { RoomEmblem } from "@/components/ui/RoomEmblem";
-import { parseISODate } from "@/lib/dates";
+import { formatMonthsDays, monthsAndDaysBetween, parseISODate } from "@/lib/dates";
 
 export default async function BookingDetailPage({
   params,
@@ -36,6 +36,10 @@ export default async function BookingDetailPage({
   const nights = Math.round(
     (parseISODate(booking.checkout_date).getTime() - parseISODate(booking.checkin_date).getTime()) /
       86_400_000
+  );
+  const { months: stayMonths, days: stayDays } = monthsAndDaysBetween(
+    booking.checkin_date,
+    booking.checkout_date
   );
   const balanceDue = booking.rate_total !== null ? booking.rate_total - booking.amount_paid : null;
 
@@ -72,7 +76,12 @@ export default async function BookingDetailPage({
         </div>
         <div>
           <dt className="font-mono text-[11px] uppercase tracking-wide text-charcoal/45">Nights</dt>
-          <dd className="mt-0.5 text-sm text-charcoal">{nights}</dd>
+          <dd className="mt-0.5 text-sm text-charcoal">
+            {nights}
+            <span className="ml-1.5 text-xs text-charcoal/45">
+              ({formatMonthsDays(stayMonths, stayDays)})
+            </span>
+          </dd>
         </div>
         <div>
           <dt className="font-mono text-[11px] uppercase tracking-wide text-charcoal/45">Room / bed</dt>
