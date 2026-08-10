@@ -14,6 +14,20 @@ function startOfMonth(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
+function addMonths(date: Date, months: number): Date {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + months);
+  return d;
+}
+
+const DURATION_PRESETS = [
+  { label: "1 Month", months: 1 },
+  { label: "2 Months", months: 2 },
+  { label: "3 Months", months: 3 },
+  { label: "4 Months", months: 4 },
+  { label: "1 Year", months: 12 },
+];
+
 function fmtShort(iso: string): string {
   return parseISODate(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
 }
@@ -49,6 +63,15 @@ export function DateRangeField({ checkinDate, checkoutDate, error }: DateRangeFi
       setCheckIn(iso);
       setCheckOut("");
     }
+  }
+
+  // Jump straight to "checkout = checkin + N months" — much faster than
+  // clicking "next month" repeatedly to extend a stay by a year, say.
+  function applyDurationPreset(months: number) {
+    if (!checkIn) return;
+    const newCheckOut = toISODate(addMonths(parseISODate(checkIn), months));
+    setCheckOut(newCheckOut);
+    setViewMonth(startOfMonth(parseISODate(newCheckOut)));
   }
 
   return (
@@ -137,6 +160,32 @@ export function DateRangeField({ checkinDate, checkoutDate, error }: DateRangeFi
                 </div>
               );
             })}
+          </div>
+
+          <div className="mt-3 border-t border-ink-navy/10 pt-3">
+            <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-charcoal/45">
+              Set check-out from check-in
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {DURATION_PRESETS.map((p) => {
+                const active =
+                  Boolean(checkIn) && checkOut === toISODate(addMonths(parseISODate(checkIn), p.months));
+                return (
+                  <button
+                    key={p.label}
+                    type="button"
+                    onClick={() => applyDurationPreset(p.months)}
+                    className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors ${
+                      active
+                        ? "border-bronze/40 bg-bronze/15 text-bronze"
+                        : "border-ink-navy/15 text-charcoal/70 hover:border-bronze/40 hover:text-bronze"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="mt-3 flex items-center justify-between gap-3 border-t border-ink-navy/10 pt-3">
