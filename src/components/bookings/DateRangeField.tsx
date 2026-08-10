@@ -25,6 +25,7 @@ const DURATION_PRESETS = [
   { label: "2 Months", months: 2 },
   { label: "3 Months", months: 3 },
   { label: "4 Months", months: 4 },
+  { label: "6 Months", months: 6 },
   { label: "1 Year", months: 12 },
 ];
 
