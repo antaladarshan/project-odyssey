@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, Users, ArrowRight, Sparkles } from "lucide-react";
 import { labels } from "@/config/labels";
 import { calcBedTotal, nightsBetween, effectiveNightly } from "@/lib/pricing";
+import { useLivePricing, FALLBACK_BASE_RATE } from "@/lib/useLivePricing";
 import DateRangePicker from "@/components/booking/DateRangePicker";
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
@@ -31,10 +32,14 @@ export default function BookingWidget({ className = "" }: { className?: string }
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
 
+  const livePricing = useLivePricing();
+  const baseRates = Object.values(livePricing.basePriceByRoomTypeId);
+  const baseRate = baseRates.length > 0 ? Math.min(...baseRates) : FALLBACK_BASE_RATE;
+
   const today = new Date().toISOString().split("T")[0];
   const nights = nightsBetween(checkIn, checkOut);
-  const perNight = nights > 0 ? effectiveNightly(nights) : 700;
-  const pricing = nights > 0 ? calcBedTotal(nights, beds) : null;
+  const perNight = nights > 0 ? effectiveNightly(nights, livePricing.config, baseRate) : baseRate;
+  const pricing = nights > 0 ? calcBedTotal(nights, beds, livePricing.config, baseRate, checkIn) : null;
 
   useEffect(() => setMounted(true), []);
 
@@ -177,10 +182,10 @@ export default function BookingWidget({ className = "" }: { className?: string }
       {!pricing && (
         <div className="flex gap-2 flex-wrap">
           <span className="flex items-center gap-1.5 text-[11px] bg-green-400/10 border border-green-400/20 text-green-400 px-2.5 py-1 rounded-full font-medium">
-            <Sparkles size={10} /> 7 nights → ₹497/night
+            <Sparkles size={10} /> 7 nights → ₹{fmt(effectiveNightly(7, livePricing.config, baseRate))}/night
           </span>
           <span className="flex items-center gap-1.5 text-[11px] bg-odyssey-blue/10 border border-odyssey-blue/20 text-odyssey-blue px-2.5 py-1 rounded-full font-medium">
-            <Sparkles size={10} /> Monthly → ₹357/night
+            <Sparkles size={10} /> Monthly → ₹{fmt(effectiveNightly(27, livePricing.config, baseRate))}/night
           </span>
         </div>
       )}

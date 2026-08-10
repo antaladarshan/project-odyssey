@@ -129,6 +129,71 @@ describe("calcPricing — monthly discount (28 nights)", () => {
   });
 });
 
+// ── extended (14-night) tier ──────────────────────────────────────────────────
+
+describe("calcPricing — extended tier (14 nights)", () => {
+  it("13 nights stays on weekly tier, 14 nights switches to extended", () => {
+    const testCfg = cfg({ extendedDiscountPct: 0.30 });
+    const r13 = calcPricing(13, 533, { config: testCfg });
+    const r14 = calcPricing(14, 533, { config: testCfg });
+    expect(r13.losDiscountPct).toBe(DEFAULT_CONFIG.weeklyDiscountPct);
+    expect(r14.losDiscountPct).toBe(0.30);
+  });
+
+  it("Odyssey config: 14 nights → 43% off, ~₹399/night (matches the site's advertised tile)", () => {
+    const odysseyCfg: Partial<PricingConfig> = {
+      weeklyDiscountPct: 0.29,
+      extendedMinNights: 14,
+      extendedDiscountPct: 0.43,
+      monthlyMinNights: 27,
+      monthlyDiscountPct: 0.49,
+    };
+    const r = calcPricing(14, 700, { config: odysseyCfg });
+    expect(r.losDiscountPct).toBe(0.43);
+    expect(r.perNight).toBe(Math.round(700 * (1 - 0.43)));
+  });
+});
+
+// ── weekend adjustment ────────────────────────────────────────────────────────
+
+describe("calcPricing — weekend (Friday/Saturday) adjustment", () => {
+  // 2026-06-19 is a Friday, so a 6-night stay from that date covers
+  // Fri, Sat, Sun, Mon, Tue, Wed — exactly 2 weekend nights.
+  it("counts only Friday/Saturday nights as weekend nights", () => {
+    const r = calcPricing(6, 500, { config: cfg({ weekendDiscountPct: 0.10 }), checkIn: "2026-06-19" });
+    expect(r.weekendNights).toBe(2);
+    expect(r.weekendDiscountAmt).toBeCloseTo(500 * 0.10 * 2, 5);
+  });
+
+  it("has no effect when checkIn is omitted (backward compatible)", () => {
+    const r = calcPricing(6, 500, { config: cfg({ weekendDiscountPct: 0.10 }) });
+    expect(r.weekendNights).toBe(0);
+    expect(r.weekendDiscountAmt).toBe(0);
+    expect(r.total).toBe(3000);
+  });
+
+  it("has no effect when weekendDiscountPct is 0, even with checkIn set", () => {
+    const r = calcPricing(6, 500, { config: cfg(), checkIn: "2026-06-19" });
+    expect(r.weekendNights).toBe(0);
+    expect(r.weekendDiscountAmt).toBe(0);
+  });
+
+  it("stacks weekend → LOS → total, in that order", () => {
+    // 7 nights from Friday 2026-06-19 → Fri..Thu, 2 weekend nights, weekly LOS tier applies.
+    const weekendPct = 0.10;
+    const c = cfg({ weekendDiscountPct: weekendPct });
+    const r = calcPricing(7, 500, { config: c, checkIn: "2026-06-19" });
+
+    const base = 7 * 500;
+    const weekendAmt = 500 * weekendPct * 2;
+    const afterWeekend = base - weekendAmt;
+    const afterLos = afterWeekend * (1 - DEFAULT_CONFIG.weeklyDiscountPct);
+
+    expect(r.weekendDiscountAmt).toBeCloseTo(weekendAmt, 5);
+    expect(r.total).toBe(Math.round(afterLos));
+  });
+});
+
 // ── WORKATION coupon ──────────────────────────────────────────────────────────
 
 describe("calcPricing — WORKATION coupon", () => {
@@ -213,9 +278,11 @@ describe("calcBilling — workation coupon on a pre-computed roomCharges", () =>
 
 // ── Project Odyssey config integration ───────────────────────────────────────
 
-describe("Project Odyssey config — ₹700 base, 29% weekly, 49% monthly (27+)", () => {
+describe("Project Odyssey config — ₹700 base, 29% weekly, 43% extended (14+), 49% monthly (27+)", () => {
   const odysseyCfg: Partial<PricingConfig> = {
     weeklyDiscountPct: 0.29,
+    extendedMinNights: 14,
+    extendedDiscountPct: 0.43,
     monthlyMinNights: 27,
     monthlyDiscountPct: 0.49,
   };
@@ -243,9 +310,9 @@ describe("Project Odyssey config — ₹700 base, 29% weekly, 49% monthly (27+)"
     expect(r7.total).toBeLessThan(r6.total);
   });
 
-  it("26 nights still on weekly tier (29% off, below monthly threshold)", () => {
+  it("26 nights on the extended tier (43% off, below monthly threshold)", () => {
     const r = calcPricing(26, 700, { config: odysseyCfg });
-    expect(r.losDiscountPct).toBe(0.29);
+    expect(r.losDiscountPct).toBe(0.43);
   });
 
   it("27+ nights → 49% off, ~₹357/night", () => {

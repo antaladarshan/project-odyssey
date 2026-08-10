@@ -10,7 +10,13 @@ import { useState } from "react";
 import { rooms } from "@/config/property";
 import { labels } from "@/config/labels";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
-import { PRICING } from "@/lib/pricing";
+import { getDiscount, effectiveNightly } from "@/lib/pricing";
+import { useLivePricing, resolveBasePrice, FALLBACK_BASE_RATE } from "@/lib/useLivePricing";
+
+// Night counts for the tier badges/summary below — mirrors the fixed
+// thresholds in useLivePricing.ts (7/14/27), which match the PMS's Pricing
+// settings page.
+const TIER_NIGHTS = [7, 14, 27] as const;
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
 
@@ -84,6 +90,15 @@ function BunkBedSVG({ beds, className = "" }: { beds: number; className?: string
 
 export default function Rooms() {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const livePricing = useLivePricing();
+
+  const baseRates = Object.values(livePricing.basePriceByRoomTypeId);
+  const summaryBaseRate = baseRates.length > 0 ? Math.min(...baseRates) : FALLBACK_BASE_RATE;
+
+  const tierBadges = TIER_NIGHTS.map((n) => ({
+    minNights: n,
+    discount: getDiscount(n, livePricing.config),
+  })).filter((t) => t.discount);
 
   return (
     <section id="rooms" className="py-14 sm:py-24 px-4 sm:px-6 bg-ink">
@@ -106,6 +121,11 @@ export default function Rooms() {
           {rooms.map((room) => {
             const bookHref = `/property/project-odyssey-ahmedabad/`;
             const isOpen = expanded === room.id;
+            const basePrice = resolveBasePrice(
+              livePricing.basePriceByRoomTypeId,
+              room.roomTypeId,
+              room.basePricePerBedPerNight,
+            );
 
             return (
               <div
@@ -159,7 +179,7 @@ export default function Rooms() {
                         {/* Pricing block */}
                         <div className="text-right shrink-0 flex flex-col gap-0.5">
                           <p className="text-2xl font-display font-bold text-ice">
-                            ₹{fmt(room.basePricePerBedPerNight)}
+                            ₹{fmt(basePrice)}
                             <span className="text-sm font-normal text-sky-tint ml-1">/ bed / night</span>
                           </p>
                           <p className="text-xs text-sky-tint">
@@ -195,13 +215,13 @@ export default function Rooms() {
 
                     {/* Discount badges */}
                     <div className="px-5 pb-3 pt-3 flex flex-wrap gap-2">
-                      {PRICING.discounts.map((d) => (
+                      {tierBadges.map(({ minNights, discount }) => (
                         <span
-                          key={d.minNights}
+                          key={minNights}
                           className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-palm/10 border-palm/25 text-palm"
                         >
                           <Sparkles size={10} />
-                          {d.minNights}+ nights: <strong>{d.badge}</strong>
+                          {minNights}+ nights: <strong>{discount!.badge}</strong>
                         </span>
                       ))}
                       <span className="flex items-center gap-1 text-[11px] text-sky-tint">
@@ -267,7 +287,7 @@ export default function Rooms() {
             {/* Per bed */}
             <div className="p-5 flex flex-col gap-1">
               <p className="text-xs text-sky-tint uppercase tracking-wider">1 Night</p>
-              <p className="text-2xl font-display font-bold text-ice">₹700</p>
+              <p className="text-2xl font-display font-bold text-ice">₹{fmt(summaryBaseRate)}</p>
               <p className="text-xs text-sky-tint">rack rate</p>
             </div>
             {/* 7 nights */}
@@ -275,7 +295,12 @@ export default function Rooms() {
               <p className="text-xs text-green-400 uppercase tracking-wider flex items-center gap-1">
                 <Sparkles size={10} /> 7 Nights
               </p>
-              <p className="text-2xl font-display font-bold text-green-400">₹499<span className="text-sm font-normal text-sky-tint ml-1">~29% off</span></p>
+              <p className="text-2xl font-display font-bold text-green-400">
+                ₹{fmt(effectiveNightly(7, livePricing.config, summaryBaseRate))}
+                <span className="text-sm font-normal text-sky-tint ml-1">
+                  ~{getDiscount(7, livePricing.config)?.pct ?? 0}% off
+                </span>
+              </p>
               <p className="text-xs text-sky-tint">per bed / night</p>
             </div>
             {/* 14 nights */}
@@ -283,7 +308,12 @@ export default function Rooms() {
               <p className="text-xs text-odyssey-blue uppercase tracking-wider flex items-center gap-1">
                 <Sparkles size={10} /> 14 Nights
               </p>
-              <p className="text-2xl font-display font-bold text-odyssey-blue">₹399<span className="text-sm font-normal text-sky-tint ml-1">~43% off</span></p>
+              <p className="text-2xl font-display font-bold text-odyssey-blue">
+                ₹{fmt(effectiveNightly(14, livePricing.config, summaryBaseRate))}
+                <span className="text-sm font-normal text-sky-tint ml-1">
+                  ~{getDiscount(14, livePricing.config)?.pct ?? 0}% off
+                </span>
+              </p>
               <p className="text-xs text-sky-tint">per bed / night</p>
             </div>
             {/* Monthly */}
@@ -291,7 +321,12 @@ export default function Rooms() {
               <p className="text-xs text-mascot-glow uppercase tracking-wider flex items-center gap-1">
                 <Sparkles size={10} /> 27+ Nights
               </p>
-              <p className="text-2xl font-display font-bold text-mascot-glow">₹357<span className="text-sm font-normal text-sky-tint ml-1">~49% off</span></p>
+              <p className="text-2xl font-display font-bold text-mascot-glow">
+                ₹{fmt(effectiveNightly(27, livePricing.config, summaryBaseRate))}
+                <span className="text-sm font-normal text-sky-tint ml-1">
+                  ~{getDiscount(27, livePricing.config)?.pct ?? 0}% off
+                </span>
+              </p>
               <p className="text-xs text-sky-tint">+ WORKATION extra 15%</p>
             </div>
           </div>

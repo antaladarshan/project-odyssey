@@ -1,5 +1,5 @@
 import { siteConfig } from "@/config/site";
-import { nightsBetween, calcBedTotal, getDiscount } from "@/lib/pricing";
+import { nightsBetween, calcBedTotal, getDiscount, type PricingConfig } from "@/lib/pricing";
 
 export interface BookingRequest {
   room?: string;
@@ -8,6 +8,13 @@ export interface BookingRequest {
   guests?: number;
   guestName?: string;
   extraNote?: string;
+  /** Live base rate + discount config, e.g. from useLivePricing(). Falls back
+   *  to the static defaults in pricing.ts when omitted. */
+  pricing?: { nightlyRate?: number; config?: Partial<PricingConfig> };
+  /** Skip the automatic price summary — set this when the caller already
+   *  includes an accurate, pre-computed total (e.g. a multi-room cart where
+   *  rooms may be at different live rates) via `extraNote`. */
+  skipAutoPricing?: boolean;
 }
 
 function formatDate(d: string) {
@@ -32,10 +39,16 @@ export function buildWhatsAppLink(req: BookingRequest): string {
   if (req.guestName) lines.push(`Name: ${req.guestName}`);
 
   // Auto-calculate price and discount if dates + beds are known
-  if (req.checkIn && req.checkOut && req.guests) {
+  if (!req.skipAutoPricing && req.checkIn && req.checkOut && req.guests) {
     const nights = nightsBetween(req.checkIn, req.checkOut);
     if (nights > 0) {
-      const { base, discount, total, discountInfo } = calcBedTotal(nights, req.guests);
+      const { base, discount, total, discountInfo } = calcBedTotal(
+        nights,
+        req.guests,
+        req.pricing?.config,
+        req.pricing?.nightlyRate,
+        req.checkIn,
+      );
       lines.push(`Nights: ${nights}`);
       lines.push(`Base total: ₹${base.toLocaleString("en-IN")}`);
       if (discountInfo) {
@@ -58,7 +71,7 @@ export function buildWhatsAppLink(req: BookingRequest): string {
 export function buildMailtoLink(req: BookingRequest): string {
   const subject = encodeURIComponent("Booking Request — Project Odyssey, Ahmedabad");
   const nights = req.checkIn && req.checkOut ? nightsBetween(req.checkIn, req.checkOut) : 0;
-  const discount = nights > 0 && req.guests ? getDiscount(nights) : null;
+  const discount = nights > 0 && req.guests ? getDiscount(nights, req.pricing?.config) : null;
 
   const body = encodeURIComponent(
     [

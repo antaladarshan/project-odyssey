@@ -10,6 +10,7 @@ import { type PropertyConfig } from "@/config/property";
 import { rooms, amenities, neighborhoodHighlights } from "@/config/property";
 import { siteConfig } from "@/config/site";
 import { nightsBetween } from "@/lib/pricing";
+import { useLivePricing } from "@/lib/useLivePricing";
 import DateSearchBar, { type DateSearch } from "./DateSearchBar";
 import AvailabilityList, { type SelectedRoom } from "./AvailabilityList";
 import BookingSummary from "./BookingSummary";
@@ -59,6 +60,7 @@ export default function PropertyDetail({ property }: Props) {
   const [liveAvailability, setLiveAvailability] = useState<Record<string, RoomTypeAvailability> | null>(
     null
   );
+  const livePricing = useLivePricing();
 
   const nights = nightsBetween(search.checkIn, search.checkOut);
 
@@ -114,6 +116,7 @@ export default function PropertyDetail({ property }: Props) {
           onWorkationToggle={setWorkation}
           onBack={() => setReviewing(false)}
           liveAvailability={liveAvailability}
+          livePricing={livePricing}
         />
       </div>
     );
@@ -199,10 +202,12 @@ export default function PropertyDetail({ property }: Props) {
                   {availableRoomCount} rooms available for {nights} night{nights !== 1 ? "s" : ""}
                 </p>
                 <AvailabilityList
+                  checkIn={search.checkIn}
                   nights={nights}
                   selected={selected}
                   onChange={setSelected}
                   liveAvailability={liveAvailability}
+                  livePricing={livePricing}
                 />
               </div>
             )}
@@ -293,6 +298,7 @@ export default function PropertyDetail({ property }: Props) {
               onWorkationToggle={setWorkation}
               onReview={() => setReviewing(true)}
               liveAvailability={liveAvailability}
+              livePricing={livePricing}
             />
           </div>
         </div>

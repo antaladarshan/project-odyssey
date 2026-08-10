@@ -1,14 +1,19 @@
 // ── Length-of-stay pricing engine ────────────────────────────────────────────
 // Single source of truth for all price calculations on this site.
 //
-// Model: flat nightly rate × nights, then apply one LOS discount tier,
-// then apply an optional coupon. Never round mid-calculation — only once
+// Model: per-night rate (base, or base adjusted for Friday/Saturday nights)
+// summed across the stay, then one LOS discount tier applied to that
+// subtotal, then an optional coupon. Never round mid-calculation — only once
 // at the very end, so there is no ±1 rupee drift.
 //
-// This site has no Razorpay / Supabase integration (WhatsApp handoff only).
-// All calculations are client-side; there is no separate server re-validation
-// step. If payment processing is added later, move calcPricing to a server
-// route and call it from the Razorpay order handler.
+// Base price and discount percentages are normally fetched live from
+// Supabase (see /api/pricing, populated from the PMS's Pricing settings
+// page) — the constants below are fallback defaults only, used if that
+// fetch hasn't completed yet or fails.
+//
+// This site has no Razorpay / Supabase-write integration (WhatsApp handoff
+// only) for bookings themselves. If payment processing is added later, move
+// calcPricing to a server route and call it from the Razorpay order handler.
 
 // ── Config ────────────────────────────────────────────────────────────────────
 
@@ -17,10 +22,16 @@ export interface PricingConfig {
   weeklyMinNights: number;
   /** fraction off, e.g. 0.20 = 20% */
   weeklyDiscountPct: number;
+  /** nights threshold for the extended-stay discount (>= n) */
+  extendedMinNights: number;
+  /** fraction off, e.g. 0.43 = 43% */
+  extendedDiscountPct: number;
   /** nights threshold for monthly discount (>= n) */
   monthlyMinNights: number;
   /** fraction off, e.g. 0.40 = 40% */
   monthlyDiscountPct: number;
+  /** fraction off applied per-night to Friday/Saturday nights, before the LOS tier */
+  weekendDiscountPct: number;
   /**
    * When true (Airbnb / Hosteller default) a 7-night stay CAN cost less than
    * a 6-night stay because the LOS discount is applied to the whole base.
@@ -37,24 +48,31 @@ export interface PricingConfig {
 export const DEFAULT_CONFIG: PricingConfig = {
   weeklyMinNights: 7,
   weeklyDiscountPct: 0.20,
+  extendedMinNights: 14,
+  extendedDiscountPct: 0,
   monthlyMinNights: 28,
   monthlyDiscountPct: 0.40,
+  weekendDiscountPct: 0,
   allowLongerCheaper: true,
   workationMinNights: 7,
   workationPct: 0.15,
 };
 
-// Project Odyssey's specific discount rates.
+// Project Odyssey's specific discount rates (fallback — see /api/pricing for
+// the live values, editable from the PMS's Pricing settings page).
 // Anchors: ~₹497/night at 7 nights, ~₹357/night for a month.
 //   700 × (1 – 0.29) = 497  → 7n = ₹3,479
 //   700 × (1 – 0.49) = 357  → 30n room charges = ₹10,710
 // Floor check: a 30-night stay WITH the 15% WORKATION coupon still totals
 //   ≈ ₹9,103 (10,710 − 1,607) — kept around ₹9,000 minimum even after the coupon.
-// Monthly tier starts at 27 nights.
+// Monthly tier starts at 27 nights; extended (14-night) tier at 43% off.
 export const ODYSSEY_PRICING_CONFIG: Partial<PricingConfig> = {
   weeklyDiscountPct: 0.29,
+  extendedMinNights: 14,
+  extendedDiscountPct: 0.43,
   monthlyMinNights: 27,
   monthlyDiscountPct: 0.49,
+  weekendDiscountPct: 0,
   allowLongerCheaper: true,
 };
 
@@ -65,13 +83,17 @@ export interface PricingBreakdown {
   nightlyRate: number;
   /** nights × nightlyRate, before any discount */
   base: number;
-  /** 0 | weeklyDiscountPct | monthlyDiscountPct */
+  /** number of Friday/Saturday nights in the stay (0 if checkIn wasn't provided) */
+  weekendNights: number;
+  /** amount subtracted for weekend nights, before the LOS discount */
+  weekendDiscountAmt: number;
+  /** 0 | weeklyDiscountPct | extendedDiscountPct | monthlyDiscountPct */
   losDiscountPct: number;
   losDiscountAmt: number;
   /** coupon fraction applied (0 if workation not active) */
   couponPct: number;
   couponAmt: number;
-  /** base – losDiscountAmt – couponAmt */
+  /** base – weekendDiscountAmt – losDiscountAmt – couponAmt */
   taxableAmount: number;
   /** taxes are currently 0 (removed per product decision) */
   taxes: number;
@@ -94,8 +116,42 @@ export function nightsBetween(checkIn: string, checkOut: string): number {
 
 function losDiscountPctFor(nights: number, cfg: PricingConfig): number {
   if (nights >= cfg.monthlyMinNights) return cfg.monthlyDiscountPct;
+  if (nights >= cfg.extendedMinNights) return cfg.extendedDiscountPct;
   if (nights >= cfg.weeklyMinNights) return cfg.weeklyDiscountPct;
   return 0;
+}
+
+/**
+ * ISO calendar dates (YYYY-MM-DD) for each night of a stay, starting at
+ * checkIn. Pure calendar-day arithmetic — deliberately not timezone-aware,
+ * since a "Friday night" is defined by the calendar date, not an instant.
+ */
+function nightDates(checkIn: string, nights: number): string[] {
+  const [y, m, d] = checkIn.split("-").map(Number);
+  const dates: string[] = [];
+  for (let i = 0; i < nights; i++) {
+    dates.push(new Date(Date.UTC(y, m - 1, d + i)).toISOString().slice(0, 10));
+  }
+  return dates;
+}
+
+/** Friday or Saturday night, by calendar date. */
+function isWeekendNight(iso: string): boolean {
+  const [y, m, d] = iso.split("-").map(Number);
+  const dow = new Date(Date.UTC(y, m - 1, d)).getUTCDay(); // 0=Sun..6=Sat
+  return dow === 5 || dow === 6;
+}
+
+/** Weekend adjustment amount + count of weekend nights for a stay. */
+function weekendAdjustment(
+  checkIn: string | undefined,
+  nights: number,
+  nightlyRate: number,
+  weekendDiscountPct: number,
+): { amt: number; count: number } {
+  if (!checkIn || !weekendDiscountPct) return { amt: 0, count: 0 };
+  const count = nightDates(checkIn, nights).filter(isWeekendNight).length;
+  return { amt: nightlyRate * weekendDiscountPct * count, count };
 }
 
 /** Raw (unrounded) total for use in the monotonic clamp — not exported. */
@@ -104,10 +160,13 @@ function rawTotal(
   nightlyRate: number,
   workation: boolean,
   cfg: PricingConfig,
+  checkIn?: string,
 ): number {
   const base = nights * nightlyRate;
+  const { amt: weekendDiscountAmt } = weekendAdjustment(checkIn, nights, nightlyRate, cfg.weekendDiscountPct);
+  const afterWeekend = base - weekendDiscountAmt;
   const losPct = losDiscountPctFor(nights, cfg);
-  const afterLos = base * (1 - losPct);
+  const afterLos = afterWeekend * (1 - losPct);
   const workationEligible = nights >= cfg.workationMinNights;
   const couponPct = workation && workationEligible ? cfg.workationPct : 0;
   return afterLos * (1 - couponPct); // no taxes
@@ -122,12 +181,15 @@ function rawTotal(
  * @param nightlyRate Base per-bed per-night rate (e.g. room.basePricePerBedPerNight).
  * @param options.workation  Whether the WORKATION coupon is applied.
  * @param options.config     Override any PricingConfig fields.
+ * @param options.checkIn    ISO check-in date. When provided, Friday/Saturday
+ *                           nights get the weekend adjustment; when omitted,
+ *                           pricing falls back to flat nights × nightlyRate.
  * @throws if nights ≤ 0.
  */
 export function calcPricing(
   nights: number,
   nightlyRate: number,
-  options: { workation?: boolean; config?: Partial<PricingConfig> } = {},
+  options: { workation?: boolean; config?: Partial<PricingConfig>; checkIn?: string } = {},
 ): PricingBreakdown {
   const cfg: PricingConfig = { ...DEFAULT_CONFIG, ...options.config };
   const workation = options.workation ?? false;
@@ -137,9 +199,17 @@ export function calcPricing(
   }
 
   const base = nights * nightlyRate;
+  const { amt: weekendDiscountAmt, count: weekendNights } = weekendAdjustment(
+    options.checkIn,
+    nights,
+    nightlyRate,
+    cfg.weekendDiscountPct,
+  );
+  const afterWeekend = base - weekendDiscountAmt;
+
   const losPct = losDiscountPctFor(nights, cfg);
-  const losDiscountAmt = base * losPct;
-  const afterLos = base - losDiscountAmt;
+  const losDiscountAmt = afterWeekend * losPct;
+  const afterLos = afterWeekend - losDiscountAmt;
 
   const workationEligible = nights >= cfg.workationMinNights;
   const couponPct = workation && workationEligible ? cfg.workationPct : 0;
@@ -153,7 +223,7 @@ export function calcPricing(
 
   // Monotonic guard: clamp so total(n) ≥ total(n-1)
   if (!cfg.allowLongerCheaper && nights > 1) {
-    const prevRaw = rawTotal(nights - 1, nightlyRate, workation, cfg);
+    const prevRaw = rawTotal(nights - 1, nightlyRate, workation, cfg, options.checkIn);
     totalRaw = Math.max(totalRaw, prevRaw);
   }
 
@@ -164,6 +234,8 @@ export function calcPricing(
     nights,
     nightlyRate,
     base,
+    weekendNights,
+    weekendDiscountAmt,
     losDiscountPct: losPct,
     losDiscountAmt,
     couponPct,
@@ -187,11 +259,12 @@ export function calcRoomPricing(
   beds: number,
   nightlyRate: number,
   config?: Partial<PricingConfig>,
+  checkIn?: string,
 ): { perNight: number; pctOff: number; roomCharges: number } {
   if (nights <= 0) {
     return { perNight: nightlyRate, pctOff: 0, roomCharges: 0 };
   }
-  const bd = calcPricing(nights, nightlyRate, { config });
+  const bd = calcPricing(nights, nightlyRate, { config, checkIn });
   const pctOff = Math.round(bd.losDiscountPct * 100);
   // beds are independent units — multiply after rounding to avoid drift
   const roomCharges = bd.total * beds;
@@ -231,7 +304,9 @@ export function calcBilling({
   };
 }
 
-// ── Legacy shims — kept so existing BookingWidget still compiles ──────────────
+// ── Fallback defaults — used only if the live /api/pricing fetch hasn't ──────
+// ── completed yet or fails. The PMS's Pricing settings page is the real ─────
+// ── source of truth once the site has loaded live config. ───────────────────
 
 export const RACK_NIGHTLY = 700;
 export const WORKATION_MIN_NIGHTS = DEFAULT_CONFIG.workationMinNights;
@@ -245,18 +320,28 @@ export function getDiscount(nights: number, config?: Partial<PricingConfig>) {
   return { pct, label: `${nights}-night stay`, badge: `${pct}% off` };
 }
 
-export function effectiveNightly(nights: number, config?: Partial<PricingConfig>): number {
-  if (nights <= 0) return RACK_NIGHTLY;
+export function effectiveNightly(
+  nights: number,
+  config?: Partial<PricingConfig>,
+  baseRate: number = RACK_NIGHTLY,
+): number {
+  if (nights <= 0) return baseRate;
   const cfg = { ...DEFAULT_CONFIG, ...ODYSSEY_PRICING_CONFIG, ...config };
   const losPct = losDiscountPctFor(nights, cfg);
-  return Math.round(RACK_NIGHTLY * (1 - losPct));
+  return Math.round(baseRate * (1 - losPct));
 }
 
-export function calcBedTotal(nights: number, beds = 1, config?: Partial<PricingConfig>) {
-  if (nights <= 0) return { base: 0, discount: 0, total: 0, perNight: RACK_NIGHTLY, discountInfo: null };
+export function calcBedTotal(
+  nights: number,
+  beds = 1,
+  config?: Partial<PricingConfig>,
+  nightlyRate: number = RACK_NIGHTLY,
+  checkIn?: string,
+) {
+  if (nights <= 0) return { base: 0, discount: 0, total: 0, perNight: nightlyRate, discountInfo: null };
   const cfg = { ...ODYSSEY_PRICING_CONFIG, ...config };
-  const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, beds, RACK_NIGHTLY, cfg);
-  const base = RACK_NIGHTLY * nights * beds;
+  const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, beds, nightlyRate, cfg, checkIn);
+  const base = nightlyRate * nights * beds;
   const discount = base - roomCharges;
   const discountInfo = pctOff > 0 ? { pct: pctOff, label: `${nights}-night stay`, badge: `${pctOff}% off` } : null;
   return { base, discount, total: roomCharges, perNight, discountInfo };
@@ -268,6 +353,7 @@ export const PRICING = {
   wholeRoom6Bed: 5000,
   discounts: [
     { minNights: 27, pct: 49, label: "Monthly Stay", badge: "49% off" },
+    { minNights: 14, pct: 43, label: "Extended Stay", badge: "43% off" },
     { minNights: 7, pct: 29, label: "Weekly Stay", badge: "29% off" },
   ],
 } as const;

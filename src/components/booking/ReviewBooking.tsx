@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Tag, ArrowLeft } from "lucide-react";
 import { rooms } from "@/config/property";
-import { calcRoomPricing, calcBilling, WORKATION_MIN_NIGHTS, ODYSSEY_PRICING_CONFIG } from "@/lib/pricing";
+import { calcRoomPricing, calcBilling, WORKATION_MIN_NIGHTS } from "@/lib/pricing";
+import { resolveBasePrice, type LivePricing } from "@/lib/useLivePricing";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
 import type { SelectedRoom } from "./AvailabilityList";
 import type { RoomTypeAvailability } from "@/app/api/availability/route";
@@ -19,6 +20,7 @@ interface Props {
   onWorkationToggle: (v: boolean) => void;
   onBack: () => void;
   liveAvailability?: Record<string, RoomTypeAvailability> | null;
+  livePricing: LivePricing;
 }
 
 export default function ReviewBooking({
@@ -30,6 +32,7 @@ export default function ReviewBooking({
   onWorkationToggle,
   onBack,
   liveAvailability,
+  livePricing,
 }: Props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -41,12 +44,14 @@ export default function ReviewBooking({
       const room = rooms.find((r) => r.id === s.roomId);
       if (!room) return null;
       const roomName = liveAvailability?.[room.roomTypeId]?.name ?? room.name;
-      const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, s.qty, room.basePricePerBedPerNight, ODYSSEY_PRICING_CONFIG);
-      return { room, roomName, qty: s.qty, perNight, pctOff, roomCharges };
+      const basePrice = resolveBasePrice(livePricing.basePriceByRoomTypeId, room.roomTypeId, room.basePricePerBedPerNight);
+      const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, s.qty, basePrice, livePricing.config, checkIn);
+      return { room, roomName, basePrice, qty: s.qty, perNight, pctOff, roomCharges };
     })
     .filter(Boolean) as Array<{
     room: (typeof rooms)[0];
     roomName: string;
+    basePrice: number;
     qty: number;
     perNight: number;
     pctOff: number;
@@ -54,7 +59,7 @@ export default function ReviewBooking({
   }>;
 
   const totalRoomCharges = lineItems.reduce((sum, l) => sum + l.roomCharges, 0);
-  const billing = calcBilling({ roomCharges: totalRoomCharges, nights, workation, config: ODYSSEY_PRICING_CONFIG });
+  const billing = calcBilling({ roomCharges: totalRoomCharges, nights, workation, config: livePricing.config });
 
   function fmtDate(d: string) {
     return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -72,6 +77,10 @@ export default function ReviewBooking({
       guestName: name,
       guests: selected.reduce((s, r) => s + r.qty, 0),
       room: roomSummary,
+      // This flow already computes an accurate multi-room total above (rooms
+      // can be at different live rates) — don't let buildWhatsAppLink append
+      // its own single-rate recalculation on top of it.
+      skipAutoPricing: true,
       extraNote: [
         workation && billing.workationEligible
           ? `WORKATION discount: −₹${fmt(billing.workationDiscount)}`
@@ -240,12 +249,12 @@ export default function ReviewBooking({
           </div>
 
           {/* Room lines */}
-          {lineItems.map(({ room, roomName, qty, perNight, pctOff, roomCharges }) => (
+          {lineItems.map(({ room, roomName, basePrice, qty, perNight, pctOff, roomCharges }) => (
             <div key={room.id} className="border-t border-white/10 pt-3">
               <div className="flex justify-between">
                 <p className="font-semibold text-ice">{roomName}</p>
                 <p className="text-xs text-sky-tint line-through">
-                  ₹{fmt(room.basePricePerBedPerNight * nights * qty)}
+                  ₹{fmt(basePrice * nights * qty)}
                 </p>
               </div>
               <div className="flex justify-between text-xs text-sky-tint">

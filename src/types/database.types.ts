@@ -176,6 +176,48 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["bookings"]["Insert"]>;
         Relationships: [];
       };
+      rate_plans: {
+        Row: {
+          id: string;
+          room_type_id: string;
+          base_price: number;
+          is_default: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_type_id: string;
+          base_price: number;
+          is_default?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["rate_plans"]["Insert"]>;
+        Relationships: [];
+      };
+      pricing_rules: {
+        Row: {
+          id: string;
+          property_id: string;
+          weekly_discount_pct: number;
+          extended_discount_pct: number;
+          monthly_discount_pct: number;
+          weekend_discount_pct: number;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          property_id: string;
+          weekly_discount_pct?: number;
+          extended_discount_pct?: number;
+          monthly_discount_pct?: number;
+          weekend_discount_pct?: number;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["pricing_rules"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Empty;
     Functions: Empty;

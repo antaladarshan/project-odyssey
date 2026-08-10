@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { Wifi, Wind, Droplets, Lock, Lamp, Minus, Plus, BedDouble, Users } from "lucide-react";
 import { rooms, type Room } from "@/config/property";
-import { calcRoomPricing, ODYSSEY_PRICING_CONFIG } from "@/lib/pricing";
+import { calcRoomPricing } from "@/lib/pricing";
+import { resolveBasePrice, type LivePricing } from "@/lib/useLivePricing";
 import type { RoomTypeAvailability } from "@/app/api/availability/route";
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
@@ -28,32 +29,45 @@ export interface SelectedRoom {
 }
 
 interface Props {
+  checkIn: string;
   nights: number;
   selected: SelectedRoom[];
   onChange: (selected: SelectedRoom[]) => void;
   /** Live counts from /api/availability, keyed by room_types.name. Falls back
    *  to each room's static `bedsAvailable` while loading or on fetch failure. */
   liveAvailability?: Record<string, RoomTypeAvailability> | null;
+  livePricing: LivePricing;
 }
 
 function RoomCard({
   room,
   displayName,
+  checkIn,
   nights,
   qty,
   bedsAvailable,
   nextFreeDate,
   onQtyChange,
+  livePricing,
 }: {
   room: Room;
   displayName: string;
+  checkIn: string;
   nights: number;
   qty: number;
   bedsAvailable: number;
   nextFreeDate: string | null;
   onQtyChange: (delta: number) => void;
+  livePricing: LivePricing;
 }) {
-  const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, Math.max(qty, 1), room.basePricePerBedPerNight, ODYSSEY_PRICING_CONFIG);
+  const basePrice = resolveBasePrice(livePricing.basePriceByRoomTypeId, room.roomTypeId, room.basePricePerBedPerNight);
+  const { perNight, pctOff, roomCharges } = calcRoomPricing(
+    nights,
+    Math.max(qty, 1),
+    basePrice,
+    livePricing.config,
+    checkIn,
+  );
   const soldOut = bedsAvailable === 0;
   const maxQty = Math.min(room.beds, bedsAvailable);
 
@@ -119,7 +133,7 @@ function RoomCard({
                   <span className="text-xs font-bold text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
                     {pctOff}% OFF
                   </span>
-                  <span className="text-xs text-sky-tint line-through">₹{fmt(room.basePricePerBedPerNight)}</span>
+                  <span className="text-xs text-sky-tint line-through">₹{fmt(basePrice)}</span>
                 </div>
               )}
               <p className="text-2xl font-display font-bold text-ice">₹{fmt(perNight)}</p>
@@ -135,7 +149,7 @@ function RoomCard({
           {/* rack rate when no dates selected */}
           {!soldOut && nights === 0 && (
             <div className="text-right shrink-0">
-              <p className="text-2xl font-display font-bold text-ice">₹{room.basePricePerBedPerNight}</p>
+              <p className="text-2xl font-display font-bold text-ice">₹{fmt(basePrice)}</p>
               <p className="text-xs text-sky-tint">per night</p>
             </div>
           )}
@@ -208,7 +222,7 @@ function RoomCard({
   );
 }
 
-export default function AvailabilityList({ nights, selected, onChange, liveAvailability }: Props) {
+export default function AvailabilityList({ checkIn, nights, selected, onChange, liveAvailability, livePricing }: Props) {
   function getQty(roomId: string) {
     return selected.find((s) => s.roomId === roomId)?.qty ?? 0;
   }
@@ -247,11 +261,13 @@ export default function AvailabilityList({ nights, selected, onChange, liveAvail
             key={room.id}
             room={room}
             displayName={displayName}
+            checkIn={checkIn}
             nights={nights}
             qty={getQty(room.id)}
             bedsAvailable={available}
             nextFreeDate={nextFreeDate}
             onQtyChange={(delta) => handleQtyChange(room, delta)}
+            livePricing={livePricing}
           />
         );
       })}

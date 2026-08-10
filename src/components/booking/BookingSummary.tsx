@@ -2,7 +2,8 @@
 
 import { Tag } from "lucide-react";
 import { rooms } from "@/config/property";
-import { calcRoomPricing, calcBilling, WORKATION_MIN_NIGHTS, ODYSSEY_PRICING_CONFIG } from "@/lib/pricing";
+import { calcRoomPricing, calcBilling, WORKATION_MIN_NIGHTS } from "@/lib/pricing";
+import { resolveBasePrice, type LivePricing } from "@/lib/useLivePricing";
 import type { SelectedRoom } from "./AvailabilityList";
 import type { RoomTypeAvailability } from "@/app/api/availability/route";
 
@@ -17,6 +18,7 @@ interface Props {
   onWorkationToggle: (v: boolean) => void;
   onReview: () => void;
   liveAvailability?: Record<string, RoomTypeAvailability> | null;
+  livePricing: LivePricing;
 }
 
 export default function BookingSummary({
@@ -28,6 +30,7 @@ export default function BookingSummary({
   onWorkationToggle,
   onReview,
   liveAvailability,
+  livePricing,
 }: Props) {
   const hasSelection = selected.length > 0 && nights > 0;
 
@@ -36,7 +39,8 @@ export default function BookingSummary({
       const room = rooms.find((r) => r.id === s.roomId);
       if (!room) return null;
       const name = liveAvailability?.[room.roomTypeId]?.name ?? room.name;
-      const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, s.qty, room.basePricePerBedPerNight, ODYSSEY_PRICING_CONFIG);
+      const basePrice = resolveBasePrice(livePricing.basePriceByRoomTypeId, room.roomTypeId, room.basePricePerBedPerNight);
+      const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, s.qty, basePrice, livePricing.config, checkIn);
       return { room, name, qty: s.qty, perNight, pctOff, roomCharges };
     })
     .filter(Boolean) as Array<{
@@ -49,7 +53,7 @@ export default function BookingSummary({
   }>;
 
   const totalRoomCharges = lineItems.reduce((sum, l) => sum + l.roomCharges, 0);
-  const billing = calcBilling({ roomCharges: totalRoomCharges, nights, workation, config: ODYSSEY_PRICING_CONFIG });
+  const billing = calcBilling({ roomCharges: totalRoomCharges, nights, workation, config: livePricing.config });
 
   function fmtDate(d: string) {
     if (!d) return "—";
