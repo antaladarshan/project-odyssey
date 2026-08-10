@@ -1,5 +1,18 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## This repo is what's actually live on projectodyssey.in
+
+Both the public marketing/booking site **and** the staff PMS (`src/app/(app)/`
+— calendar, bookings, guests, pricing settings) are served from here, on
+`master`, auto-deployed via Vercel. The PMS section was originally merged in
+from a separate repo (`Project Odyssey - PMS + Channel Manager`, commit
+"Merge Project Odyssey PMS into the marketing site"). That other repo still
+exists and still gets worked in sometimes, but it is **not deployed** — it
+diverged after the merge and now lags behind what's here. Any new staff-facing
+feature needs to land in *this* repo's `(app)` section to actually go live;
+building it in the other repo alone won't reach production. (Learned this the
+hard way on 2026-08-11 building the Pricing settings page twice.)
+
 ## Getting Started
 
 First, run the development server:
