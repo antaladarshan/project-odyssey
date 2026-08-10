@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, PlusCircle, Users } from "lucide-react";
+import { CalendarDays, PlusCircle, Users, IndianRupee } from "lucide-react";
 
 const NAV_ITEMS = [
   { href: "/calendar", label: "Calendar", Icon: CalendarDays },
   { href: "/bookings/new", label: "Add", Icon: PlusCircle },
   { href: "/guests", label: "Guests", Icon: Users },
+  { href: "/settings/pricing", label: "Pricing", Icon: IndianRupee },
 ];
 
 function isActive(pathname: string, href: string) {
