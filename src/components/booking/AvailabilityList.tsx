@@ -4,8 +4,14 @@ import Image from "next/image";
 import { Wifi, Wind, Droplets, Lock, Lamp, Minus, Plus, BedDouble, Users } from "lucide-react";
 import { rooms, type Room } from "@/config/property";
 import { calcRoomPricing, ODYSSEY_PRICING_CONFIG } from "@/lib/pricing";
+import type { RoomTypeAvailability } from "@/app/api/availability/route";
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
+
+function fmtShortDate(iso: string): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
 
 const amenityIcons: Record<string, React.ReactNode> = {
   "Wi-Fi": <Wifi size={13} />,
@@ -25,22 +31,29 @@ interface Props {
   nights: number;
   selected: SelectedRoom[];
   onChange: (selected: SelectedRoom[]) => void;
+  /** Live counts from /api/availability, keyed by room_types.name. Falls back
+   *  to each room's static `bedsAvailable` while loading or on fetch failure. */
+  liveAvailability?: Record<string, RoomTypeAvailability> | null;
 }
 
 function RoomCard({
   room,
   nights,
   qty,
+  bedsAvailable,
+  nextFreeDate,
   onQtyChange,
 }: {
   room: Room;
   nights: number;
   qty: number;
+  bedsAvailable: number;
+  nextFreeDate: string | null;
   onQtyChange: (delta: number) => void;
 }) {
   const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, Math.max(qty, 1), room.basePricePerBedPerNight, ODYSSEY_PRICING_CONFIG);
-  const soldOut = room.bedsAvailable === 0;
-  const maxQty = Math.min(room.beds, room.bedsAvailable);
+  const soldOut = bedsAvailable === 0;
+  const maxQty = Math.min(room.beds, bedsAvailable);
 
   return (
     <div
@@ -145,10 +158,15 @@ function RoomCard({
         <div className="flex items-center justify-between gap-3 pt-1 border-t border-white/8 flex-wrap">
           {!soldOut ? (
             <span className="text-sm font-bold text-green-400">
-              {room.bedsAvailable} BEDS AVAILABLE
+              {bedsAvailable} BEDS AVAILABLE
             </span>
           ) : (
-            <span className="text-sm font-bold text-coral">SOLD OUT</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-sm font-bold text-coral">SOLD OUT</span>
+              {nextFreeDate && (
+                <span className="text-xs text-sky-tint">Next available {fmtShortDate(nextFreeDate)}</span>
+              )}
+            </div>
           )}
 
           {!soldOut && (
@@ -188,14 +206,18 @@ function RoomCard({
   );
 }
 
-export default function AvailabilityList({ nights, selected, onChange }: Props) {
+export default function AvailabilityList({ nights, selected, onChange, liveAvailability }: Props) {
   function getQty(roomId: string) {
     return selected.find((s) => s.roomId === roomId)?.qty ?? 0;
   }
 
+  function getAvailability(room: Room): RoomTypeAvailability {
+    return liveAvailability?.[room.roomTypeName] ?? { available: room.bedsAvailable, nextFreeDate: null };
+  }
+
   function handleQtyChange(room: Room, delta: number) {
     const current = getQty(room.id);
-    const next = Math.max(0, Math.min(current + delta, room.bedsAvailable));
+    const next = Math.max(0, Math.min(current + delta, getAvailability(room).available));
     if (next === 0) {
       onChange(selected.filter((s) => s.roomId !== room.id));
     } else {
@@ -210,15 +232,20 @@ export default function AvailabilityList({ nights, selected, onChange }: Props) 
 
   return (
     <div className="flex flex-col gap-4">
-      {rooms.map((room) => (
-        <RoomCard
-          key={room.id}
-          room={room}
-          nights={nights}
-          qty={getQty(room.id)}
-          onQtyChange={(delta) => handleQtyChange(room, delta)}
-        />
-      ))}
+      {rooms.map((room) => {
+        const { available, nextFreeDate } = getAvailability(room);
+        return (
+          <RoomCard
+            key={room.id}
+            room={room}
+            nights={nights}
+            qty={getQty(room.id)}
+            bedsAvailable={available}
+            nextFreeDate={nextFreeDate}
+            onQtyChange={(delta) => handleQtyChange(room, delta)}
+          />
+        );
+      })}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import DateSearchBar, { type DateSearch } from "./DateSearchBar";
 import AvailabilityList, { type SelectedRoom } from "./AvailabilityList";
 import BookingSummary from "./BookingSummary";
 import ReviewBooking from "./ReviewBooking";
+import type { RoomTypeAvailability } from "@/app/api/availability/route";
 
 const amenityIconMap: Record<string, React.ReactNode> = {
   Wifi: <Wifi size={18} />,
@@ -55,8 +56,32 @@ export default function PropertyDetail({ property }: Props) {
   const [workation, setWorkation] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [policyOpen, setPolicyOpen] = useState<string | null>(null);
+  const [liveAvailability, setLiveAvailability] = useState<Record<string, RoomTypeAvailability> | null>(
+    null
+  );
 
   const nights = nightsBetween(search.checkIn, search.checkOut);
+
+  // Pull real bed counts for the selected dates. Falls back to each room's
+  // static `bedsAvailable` (see AvailabilityList) while loading or on failure.
+  useEffect(() => {
+    if (!search.checkIn || !search.checkOut) return;
+    const controller = new AbortController();
+
+    fetch(`/api/availability?checkIn=${search.checkIn}&checkOut=${search.checkOut}`, {
+      signal: controller.signal,
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setLiveAvailability(data?.availability ?? null))
+      .catch(() => setLiveAvailability(null));
+
+    return () => controller.abort();
+  }, [search.checkIn, search.checkOut]);
+
+  const availableRoomCount = rooms.filter((r) => {
+    const live = liveAvailability?.[r.roomTypeName];
+    return (live ? live.available : r.bedsAvailable) > 0;
+  }).length;
 
   function handleSearch(s: DateSearch) {
     setSearch(s);
@@ -170,13 +195,13 @@ export default function PropertyDetail({ property }: Props) {
             {searched && (
               <div id="availability" className="flex flex-col gap-4">
                 <p className="text-xs font-bold text-sky-tint uppercase tracking-widest">
-                  {rooms.filter((r) => r.bedsAvailable > 0).length} rooms available for {nights}{" "}
-                  night{nights !== 1 ? "s" : ""}
+                  {availableRoomCount} rooms available for {nights} night{nights !== 1 ? "s" : ""}
                 </p>
                 <AvailabilityList
                   nights={nights}
                   selected={selected}
                   onChange={setSelected}
+                  liveAvailability={liveAvailability}
                 />
               </div>
             )}

@@ -4,6 +4,9 @@ export interface Room {
   id: string;
   slug: string;
   name: string;
+  /** Matches room_types.name in Supabase — links this marketing room card to
+   *  the real inventory so /api/availability can report live bed counts. */
+  roomTypeName: string;
   type: RoomType;
   beds: number;
   bedType: string;
@@ -88,6 +91,7 @@ export const rooms: Room[] = [
     id: "room-01",
     slug: "the-explorer-dorm",
     name: "The Explorer",
+    roomTypeName: "Olympus",
     type: "mixed_dorm",
     beds: 4,
     bedType: "Bunk Beds",
@@ -106,6 +110,7 @@ export const rooms: Room[] = [
     id: "room-02",
     slug: "the-navigator-dorm",
     name: "The Navigator",
+    roomTypeName: "Ithaca",
     type: "mixed_dorm",
     beds: 4,
     bedType: "Bunk Beds",
@@ -123,6 +128,7 @@ export const rooms: Room[] = [
     id: "room-03",
     slug: "the-voyager-dorm",
     name: "The Voyager",
+    roomTypeName: "Oracle",
     type: "dorm",
     beds: 6,
     bedType: "Bunk Beds",

@@ -101,6 +101,8 @@ export async function updateBookingDetailsAction(
   const amountPaidRaw = String(formData.get("amount_paid") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
   const roomBedId = String(formData.get("room_bed_id") ?? "").trim();
+  const checkinDate = String(formData.get("checkin_date") ?? "").trim();
+  const checkoutDate = String(formData.get("checkout_date") ?? "").trim();
 
   const rateTotal = rateTotalRaw ? Number(rateTotalRaw) : null;
   const amountPaid = amountPaidRaw ? Number(amountPaidRaw) : 0;
@@ -114,11 +116,24 @@ export async function updateBookingDetailsAction(
   if (!roomBedId) {
     return { fieldErrors: { room_bed_id: ["Pick a room/bed"] } };
   }
+  if (!checkinDate || !checkoutDate) {
+    return { fieldErrors: { checkout_date: ["Pick both check-in and check-out dates"] } };
+  }
+  if (checkoutDate <= checkinDate) {
+    return { fieldErrors: { checkout_date: ["Check-out must be after check-in"] } };
+  }
 
   const supabase = await createClient();
   const { error } = await supabase
     .from("bookings")
-    .update({ rate_total: rateTotal, amount_paid: amountPaid, note: note || null, room_bed_id: roomBedId })
+    .update({
+      rate_total: rateTotal,
+      amount_paid: amountPaid,
+      note: note || null,
+      room_bed_id: roomBedId,
+      checkin_date: checkinDate,
+      checkout_date: checkoutDate,
+    })
     .eq("id", bookingId);
 
   if (error) {

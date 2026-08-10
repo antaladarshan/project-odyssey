@@ -12,6 +12,8 @@ export interface EditBookingDetailsProps {
   roomTypes: { id: string; name: string }[];
   roomsBeds: { id: string; room_type_id: string; label: string }[];
   currentRoomBedId: string;
+  checkinDate: string;
+  checkoutDate: string;
   rateTotal: number | null;
   amountPaid: number;
   note: string | null;
@@ -24,6 +26,8 @@ export function EditBookingDetails({
   roomTypes,
   roomsBeds,
   currentRoomBedId,
+  checkinDate,
+  checkoutDate,
   rateTotal,
   amountPaid,
   note,
@@ -39,6 +43,25 @@ export function EditBookingDetails({
         defaultValue={currentRoomBedId}
         error={state.fieldErrors?.room_bed_id?.[0]}
       />
+      <div className="grid grid-cols-2 gap-3">
+        <Input
+          id="checkin_date"
+          name="checkin_date"
+          type="date"
+          label="Check-in"
+          defaultValue={checkinDate}
+        />
+        <Input
+          id="checkout_date"
+          name="checkout_date"
+          type="date"
+          label="Check-out"
+          defaultValue={checkoutDate}
+        />
+      </div>
+      {state.fieldErrors?.checkout_date && (
+        <p className="text-sm text-oxide">{state.fieldErrors.checkout_date[0]}</p>
+      )}
       <div className="grid grid-cols-2 gap-3">
         <Input
           id="rate_total"

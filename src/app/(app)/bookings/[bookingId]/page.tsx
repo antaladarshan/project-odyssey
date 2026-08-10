@@ -105,6 +105,8 @@ export default async function BookingDetailPage({
           roomTypes={roomTypes ?? []}
           roomsBeds={roomsBeds ?? []}
           currentRoomBedId={booking.room_bed_id}
+          checkinDate={booking.checkin_date}
+          checkoutDate={booking.checkout_date}
           rateTotal={booking.rate_total}
           amountPaid={booking.amount_paid}
           note={booking.note}
