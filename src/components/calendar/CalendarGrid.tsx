@@ -4,6 +4,7 @@ import { CalendarDateHeader } from "./CalendarDateHeader";
 import { CalendarRow, type CalendarRowBooking } from "./CalendarRow";
 import { CalendarScrollArea } from "./CalendarScrollArea";
 import { EditableRoomTypeName } from "./EditableRoomTypeName";
+import { RoomTypeBlockToggle } from "./RoomTypeBlockToggle";
 import { RoomEmblem } from "@/components/ui/RoomEmblem";
 
 export interface CalendarGridProps {
@@ -69,12 +70,14 @@ export async function CalendarGrid({ windowStart, windowDays }: CalendarGridProp
         {(roomTypes ?? []).map((roomType) => {
           const beds = (roomsBeds ?? []).filter((rb) => rb.room_type_id === roomType.id);
           if (beds.length === 0) return null;
+          const isBlocked = beds.every((b) => !b.is_active);
 
           return (
             <div key={roomType.id}>
               <div className="flex items-center gap-1.5 border-t border-ink-navy/10 bg-bronze/[0.06] px-3 py-1.5">
                 <RoomEmblem roomTypeName={roomType.name} size={14} className="shrink-0 text-bronze" />
                 <EditableRoomTypeName roomTypeId={roomType.id} name={roomType.name} />
+                <RoomTypeBlockToggle roomTypeId={roomType.id} isBlocked={isBlocked} />
               </div>
               {beds.map((roomBed) => (
                 <CalendarRow

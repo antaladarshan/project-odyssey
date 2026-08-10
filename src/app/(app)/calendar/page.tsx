@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
+import { CalendarNav } from "@/components/calendar/CalendarNav";
 import { CALENDAR_WINDOW_DAYS, addDays, parseISODate, startOfToday, toISODate } from "@/lib/dates";
 
 export default async function CalendarPage({
@@ -33,28 +34,7 @@ export default async function CalendarPage({
         </Link>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Link
-          href={`/calendar?start=${prevStart}`}
-          className="rounded-lg border border-ink-navy/15 bg-surface-white p-1.5 text-ink-navy shadow-soft transition-shadow hover:shadow-lift"
-          aria-label="Previous 14 days"
-        >
-          <ChevronLeft size={18} />
-        </Link>
-        <Link
-          href={`/calendar?start=${todayStart}`}
-          className="rounded-lg border border-ink-navy/15 bg-surface-white px-3 py-1.5 text-sm font-medium text-ink-navy shadow-soft transition-shadow hover:shadow-lift"
-        >
-          Today
-        </Link>
-        <Link
-          href={`/calendar?start=${nextStart}`}
-          className="rounded-lg border border-ink-navy/15 bg-surface-white p-1.5 text-ink-navy shadow-soft transition-shadow hover:shadow-lift"
-          aria-label="Next 14 days"
-        >
-          <ChevronRight size={18} />
-        </Link>
-      </div>
+      <CalendarNav prevStart={prevStart} todayStart={todayStart} nextStart={nextStart} />
 
       <CalendarGrid windowStart={windowStart} windowDays={CALENDAR_WINDOW_DAYS} />
     </div>

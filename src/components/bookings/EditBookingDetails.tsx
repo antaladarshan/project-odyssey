@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { updateBookingDetailsAction, type EditBookingFormState } from "@/lib/actions/bookings";
 import { RoomBedPicker } from "./RoomBedPicker";
+import { DateRangeField } from "./DateRangeField";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 import { Button } from "@/components/ui/Button";
@@ -43,25 +44,11 @@ export function EditBookingDetails({
         defaultValue={currentRoomBedId}
         error={state.fieldErrors?.room_bed_id?.[0]}
       />
-      <div className="grid grid-cols-2 gap-3">
-        <Input
-          id="checkin_date"
-          name="checkin_date"
-          type="date"
-          label="Check-in"
-          defaultValue={checkinDate}
-        />
-        <Input
-          id="checkout_date"
-          name="checkout_date"
-          type="date"
-          label="Check-out"
-          defaultValue={checkoutDate}
-        />
-      </div>
-      {state.fieldErrors?.checkout_date && (
-        <p className="text-sm text-oxide">{state.fieldErrors.checkout_date[0]}</p>
-      )}
+      <DateRangeField
+        checkinDate={checkinDate}
+        checkoutDate={checkoutDate}
+        error={state.fieldErrors?.checkout_date?.[0]}
+      />
       <div className="grid grid-cols-2 gap-3">
         <Input
           id="rate_total"
