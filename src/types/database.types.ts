@@ -6,6 +6,7 @@ export type BookingStatus = "confirmed" | "checked_in" | "checked_out" | "cancel
 export type ChannelType = "ota" | "direct" | "messaging" | "phone" | "walkin";
 export type SyncMethod = "ical" | "manual" | "direct_engine";
 export type StaffRole = "owner" | "staff";
+export type TravelerStatus = "pending" | "assigned" | "rejected";
 
 type Empty = { [_ in never]: never };
 
@@ -124,6 +125,7 @@ export interface Database {
           email: string | null;
           id_proof_type: string | null;
           id_proof_number: string | null;
+          id_card_path: string | null;
           notes: string | null;
           created_at: string;
           updated_at: string;
@@ -135,6 +137,7 @@ export interface Database {
           email?: string | null;
           id_proof_type?: string | null;
           id_proof_number?: string | null;
+          id_card_path?: string | null;
           notes?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -218,6 +221,60 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["pricing_rules"]["Insert"]>;
         Relationships: [];
       };
+      guest_checkins: {
+        Row: {
+          id: string;
+          room_type_id: string;
+          email: string;
+          phone: string | null;
+          checkin_date: string;
+          checkout_date: string;
+          add_ons: string[];
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          room_type_id: string;
+          email: string;
+          phone?: string | null;
+          checkin_date: string;
+          checkout_date: string;
+          add_ons?: string[];
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["guest_checkins"]["Insert"]>;
+        Relationships: [];
+      };
+      guest_checkin_travelers: {
+        Row: {
+          id: string;
+          checkin_id: string;
+          name: string;
+          id_card_path: string;
+          status: TravelerStatus;
+          assigned_room_bed_id: string | null;
+          booking_id: string | null;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          checkin_id: string;
+          name: string;
+          id_card_path: string;
+          status?: TravelerStatus;
+          assigned_room_bed_id?: string | null;
+          booking_id?: string | null;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["guest_checkin_travelers"]["Insert"]>;
+        Relationships: [];
+      };
     };
     Views: Empty;
     Functions: Empty;
@@ -226,6 +283,7 @@ export interface Database {
       channel_type: ChannelType;
       sync_method: SyncMethod;
       staff_role: StaffRole;
+      traveler_status: TravelerStatus;
     };
     CompositeTypes: Empty;
   };

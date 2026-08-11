@@ -37,6 +37,10 @@ export default async function GuestProfilePage({
   const roomBedById = new Map((roomsBeds ?? []).map((rb) => [rb.id, rb]));
   const channelById = new Map((channels ?? []).map((c) => [c.id, c]));
 
+  const { data: idCardSignedUrl } = guest.id_card_path
+    ? await supabase.storage.from("id-cards").createSignedUrl(guest.id_card_path, 300)
+    : { data: null };
+
   const stays: StayHistoryItem[] = (bookings ?? []).flatMap((booking) => {
     const channel = channelById.get(booking.channel_id);
     if (!channel) return [];
@@ -60,6 +64,18 @@ export default async function GuestProfilePage({
       </Link>
 
       <GuestProfileCard name={guest.name} phone={guest.phone} email={guest.email} notes={guest.notes} />
+
+      {idCardSignedUrl?.signedUrl && (
+        <div className="rounded-2xl border border-ink-navy/10 bg-surface-white p-5 shadow-soft">
+          <h2 className="mb-3 font-serif text-lg text-ink-navy">ID card</h2>
+          {/* eslint-disable-next-line @next/next/no-img-element -- private bucket, signed URL changes per request */}
+          <img
+            src={idCardSignedUrl.signedUrl}
+            alt="Guest ID card"
+            className="w-full rounded-xl border border-ink-navy/10"
+          />
+        </div>
+      )}
 
       <div>
         <h2 className="mb-3 font-serif text-lg text-ink-navy">Stay history</h2>
