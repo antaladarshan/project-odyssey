@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/auth/profile";
 
 export interface RatePlanFormState {
   error?: string;
@@ -12,6 +13,9 @@ export async function updateRatePlanAction(
   _prevState: RatePlanFormState,
   formData: FormData
 ): Promise<RatePlanFormState> {
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "owner") return { error: "Not authorized" };
+
   const basePrice = Number(String(formData.get("base_price") ?? "").trim());
 
   if (!Number.isFinite(basePrice) || basePrice <= 0) {
@@ -48,6 +52,9 @@ export async function updatePricingRulesAction(
   _prevState: PricingRulesFormState,
   formData: FormData
 ): Promise<PricingRulesFormState> {
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "owner") return { error: "Not authorized" };
+
   const values: Record<string, number> = {};
   const fieldErrors: Record<string, string[]> = {};
 

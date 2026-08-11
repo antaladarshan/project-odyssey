@@ -3,25 +3,30 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CalendarDays, PlusCircle, Users, IndianRupee, UserCheck } from "lucide-react";
+import type { StaffRole } from "@/types/database.types";
 
 const NAV_ITEMS = [
   { href: "/calendar", label: "Calendar", Icon: CalendarDays },
   { href: "/bookings/new", label: "Add", Icon: PlusCircle },
   { href: "/checkins", label: "Check-ins", Icon: UserCheck },
   { href: "/guests", label: "Guests", Icon: Users },
-  { href: "/settings/pricing", label: "Pricing", Icon: IndianRupee },
+  { href: "/settings/pricing", label: "Pricing", Icon: IndianRupee, ownerOnly: true },
 ];
 
 function isActive(pathname: string, href: string) {
   return href === "/calendar" ? pathname === "/calendar" : pathname.startsWith(href);
 }
 
-export function DesktopNavLinks() {
+function visibleItems(role: StaffRole) {
+  return NAV_ITEMS.filter((item) => !item.ownerOnly || role === "owner");
+}
+
+export function DesktopNavLinks({ role }: { role: StaffRole }) {
   const pathname = usePathname();
 
   return (
     <nav className="mt-6 flex flex-col gap-1">
-      {NAV_ITEMS.map(({ href, label, Icon }) => {
+      {visibleItems(role).map(({ href, label, Icon }) => {
         const active = isActive(pathname, href);
         return (
           <Link
@@ -42,12 +47,12 @@ export function DesktopNavLinks() {
   );
 }
 
-export function MobileNavLinks() {
+export function MobileNavLinks({ role }: { role: StaffRole }) {
   const pathname = usePathname();
 
   return (
     <>
-      {NAV_ITEMS.map(({ href, label, Icon }) => {
+      {visibleItems(role).map(({ href, label, Icon }) => {
         const active = isActive(pathname, href);
         return (
           <Link

@@ -1,8 +1,13 @@
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/lib/auth/profile";
 import { RatePlanForm } from "@/components/settings/RatePlanForm";
 import { PricingRulesForm } from "@/components/settings/PricingRulesForm";
 
 export default async function PricingSettingsPage() {
+  const profile = await getCurrentProfile();
+  if (profile?.role !== "owner") redirect("/calendar");
+
   const supabase = await createClient();
 
   const { data: property } = await supabase.from("properties").select("id").limit(1).single();

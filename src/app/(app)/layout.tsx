@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { SignOutButton } from "@/components/SignOutButton";
 import { DesktopNavLinks, MobileNavLinks } from "@/components/NavLinks";
+import { getCurrentProfile } from "@/lib/auth/profile";
 
 export const metadata: Metadata = {
   title: { default: "Project Odyssey", template: "%s | Project Odyssey" },
@@ -15,7 +16,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AppLayout({ children }: { children: ReactNode }) {
+export default async function AppLayout({ children }: { children: ReactNode }) {
+  const profile = await getCurrentProfile();
+  const role = profile?.role ?? "staff";
+
   return (
     <div className="pms-scope flex min-h-full flex-1 flex-col md:flex-row">
       {/* Desktop left nav */}
@@ -26,7 +30,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <span className="font-serif text-lg leading-tight text-ink-navy">Project Odyssey</span>
         </div>
-        <DesktopNavLinks />
+        <DesktopNavLinks role={role} />
         <div className="mt-auto">
           <SignOutButton />
         </div>
@@ -37,7 +41,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
         {/* Mobile bottom nav */}
         <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-ink-navy/10 bg-surface-white shadow-[0_-2px_12px_rgba(30,51,72,0.06)] md:hidden">
-          <MobileNavLinks />
+          <MobileNavLinks role={role} />
         </nav>
       </div>
     </div>
