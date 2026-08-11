@@ -227,8 +227,10 @@ export function calcPricing(
     totalRaw = Math.max(totalRaw, prevRaw);
   }
 
-  // Round exactly once at the end
-  const total = Math.round(totalRaw);
+  // Round exactly once at the end. Floor at 0 as defense-in-depth — a
+  // misconfigured discount % (e.g. >100, which the DB now also rejects via
+  // a CHECK constraint) should never surface a negative price to a guest.
+  const total = Math.max(0, Math.round(totalRaw));
 
   return {
     nights,
