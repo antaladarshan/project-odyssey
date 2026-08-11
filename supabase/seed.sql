@@ -38,6 +38,14 @@ select id, 'Bed ' || n, false, n
 from room_types, generate_series(1, 6) as n
 where room_types.name = 'Oracle';
 
+-- Pricing: base rate per bed + LOS/weekend discount percentages, matching
+-- what's currently live on projectodyssey.in (see src/lib/pricing.ts there).
+insert into rate_plans (room_type_id, base_price)
+select id, 700 from room_types;
+
+insert into pricing_rules (property_id, weekly_discount_pct, extended_discount_pct, monthly_discount_pct, weekend_discount_pct)
+select id, 29, 43, 49, 0 from properties limit 1;
+
 -- Real tenant/guest data is NOT committed to this repo.
 -- Run supabase/seed.private.sql (gitignored, local-only) after this file
 -- to load current tenant bookings into a local/dev database.
