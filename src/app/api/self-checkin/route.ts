@@ -141,6 +141,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (checkinError || !checkin) {
+    console.error("[self-checkin] guest_checkins insert failed", checkinError);
     await supabase.storage.from("id-cards").remove(uploadedPaths);
     return NextResponse.json({ error: "Could not submit your check-in. Try again." }, { status: 500 });
   }
@@ -155,6 +156,7 @@ export async function POST(request: NextRequest) {
   );
 
   if (travelersError) {
+    console.error("[self-checkin] guest_checkin_travelers insert failed", travelersError);
     await supabase.storage.from("id-cards").remove(uploadedPaths);
     await supabase.from("guest_checkins").delete().eq("id", checkin.id);
     return NextResponse.json({ error: "Could not submit your check-in. Try again." }, { status: 500 });
