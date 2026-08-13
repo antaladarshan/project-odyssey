@@ -7,6 +7,7 @@ import { BookingStatusBadge } from "@/components/bookings/BookingStatusBadge";
 import { BookingActions } from "@/components/bookings/BookingActions";
 import { EditBookingDetails } from "@/components/bookings/EditBookingDetails";
 import { RoomEmblem } from "@/components/ui/RoomEmblem";
+import { IdDocumentGallery } from "@/components/ui/IdDocumentGallery";
 import { formatMonthsDays, monthsAndDaysBetween, parseISODate } from "@/lib/dates";
 
 export default async function BookingDetailPage({
@@ -43,9 +44,12 @@ export default async function BookingDetailPage({
   );
   const balanceDue = booking.rate_total !== null ? booking.rate_total - booking.amount_paid : null;
 
-  const { data: idCardSignedUrl } = guest?.id_card_path
-    ? await supabase.storage.from("id-cards").createSignedUrl(guest.id_card_path, 300)
-    : { data: null };
+  const idDocuments = await Promise.all(
+    (guest?.id_card_paths ?? []).map(async (path) => {
+      const { data } = await supabase.storage.from("id-cards").createSignedUrl(path, 300);
+      return { path, signedUrl: data?.signedUrl ?? null };
+    })
+  );
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-6 p-4 md:p-6">
@@ -109,15 +113,10 @@ export default async function BookingDetailPage({
         </div>
       </dl>
 
-      {idCardSignedUrl?.signedUrl && (
+      {idDocuments.length > 0 && (
         <div className="rounded-2xl border border-ink-navy/10 bg-surface-white p-5 shadow-soft">
-          <h2 className="mb-3 font-serif text-lg text-ink-navy">ID card</h2>
-          {/* eslint-disable-next-line @next/next/no-img-element -- private bucket, signed URL changes per request */}
-          <img
-            src={idCardSignedUrl.signedUrl}
-            alt="Guest ID card"
-            className="w-full rounded-xl border border-ink-navy/10"
-          />
+          <h2 className="mb-3 font-serif text-lg text-ink-navy">ID documents</h2>
+          <IdDocumentGallery documents={idDocuments} altText="Guest ID document" />
         </div>
       )}
 

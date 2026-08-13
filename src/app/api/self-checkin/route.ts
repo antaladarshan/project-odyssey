@@ -7,6 +7,11 @@ function isValidISODate(value: string): boolean {
 }
 
 const MAX_FILE_BYTES = 8 * 1024 * 1024;
+const MAX_FILES_PER_TRAVELER = 5;
+
+function isAllowedIdCardType(type: string): boolean {
+  return type.startsWith("image/") || type === "application/pdf";
+}
 
 export async function POST(request: NextRequest) {
   const formData = await request.formData();
@@ -32,33 +37,54 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // traveler_name and traveler_id_card are two parallel arrays, appended to
-  // FormData in matching order by the client — one pair per traveler.
-  const idCards = formData.getAll("traveler_id_card");
-  if (idCards.length !== input.traveler_name.length) {
-    return NextResponse.json(
-      { fieldErrors: { traveler_id_card: ["Every traveler needs an ID photo"] } },
-      { status: 400 }
-    );
-  }
-  for (const idCard of idCards) {
-    if (!(idCard instanceof File) || idCard.size === 0) {
+  // traveler_name is an array; each traveler's file(s) come in under their
+  // own indexed field (traveler_id_card_0, traveler_id_card_1, ...) since a
+  // traveler can now attach more than one file and a single shared field
+  // name would lose the traveler boundary once `multiple` is involved.
+  const idCardsByTraveler = input.traveler_name.map((_, index) =>
+    formData.getAll(`traveler_id_card_${index}`)
+  );
+
+  for (const files of idCardsByTraveler) {
+    if (files.length === 0) {
       return NextResponse.json(
-        { fieldErrors: { traveler_id_card: ["Upload a photo of each traveler's ID card"] } },
+        { fieldErrors: { traveler_id_card: ["Every traveler needs at least one ID photo or PDF"] } },
         { status: 400 }
       );
     }
-    if (idCard.size > MAX_FILE_BYTES) {
+    if (files.length > MAX_FILES_PER_TRAVELER) {
       return NextResponse.json(
-        { fieldErrors: { traveler_id_card: ["A photo is too large — please use a smaller image"] } },
+        {
+          fieldErrors: {
+            traveler_id_card: [`Upload at most ${MAX_FILES_PER_TRAVELER} files per traveler`],
+          },
+        },
         { status: 400 }
       );
     }
-    if (!idCard.type.startsWith("image/")) {
-      return NextResponse.json(
-        { fieldErrors: { traveler_id_card: ["Upload image files only"] } },
-        { status: 400 }
-      );
+    for (const file of files) {
+      if (!(file instanceof File) || file.size === 0) {
+        return NextResponse.json(
+          { fieldErrors: { traveler_id_card: ["Upload a photo or PDF of each traveler's ID"] } },
+          { status: 400 }
+        );
+      }
+      if (file.size > MAX_FILE_BYTES) {
+        return NextResponse.json(
+          {
+            fieldErrors: {
+              traveler_id_card: ["A file is too large — please use a smaller image or PDF"],
+            },
+          },
+          { status: 400 }
+        );
+      }
+      if (!isAllowedIdCardType(file.type)) {
+        return NextResponse.json(
+          { fieldErrors: { traveler_id_card: ["Upload image or PDF files only"] } },
+          { status: 400 }
+        );
+      }
     }
   }
 
@@ -75,19 +101,30 @@ export async function POST(request: NextRequest) {
   }
 
   const uploadedPaths: string[] = [];
-  for (const idCard of idCards as File[]) {
-    const extension = idCard.name.includes(".") ? idCard.name.split(".").pop() : "jpg";
-    const objectPath = `${crypto.randomUUID()}.${extension}`;
+  const idCardPathsByTraveler: string[][] = [];
+  for (const [travelerIndex, files] of idCardsByTraveler.entries()) {
+    const paths: string[] = [];
+    for (const file of files as File[]) {
+      const extension = file.name.includes(".") ? file.name.split(".").pop() : "jpg";
+      const objectPath = `${crypto.randomUUID()}.${extension}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("id-cards")
-      .upload(objectPath, idCard, { contentType: idCard.type });
+      const { error: uploadError } = await supabase.storage
+        .from("id-cards")
+        .upload(objectPath, file, { contentType: file.type });
 
-    if (uploadError) {
-      if (uploadedPaths.length > 0) await supabase.storage.from("id-cards").remove(uploadedPaths);
-      return NextResponse.json({ error: "Could not upload an ID card. Try again." }, { status: 500 });
+      if (uploadError) {
+        console.error("[self-checkin] storage upload failed", {
+          travelerIndex,
+          fileName: file.name,
+          uploadError,
+        });
+        if (uploadedPaths.length > 0) await supabase.storage.from("id-cards").remove(uploadedPaths);
+        return NextResponse.json({ error: "Could not upload an ID card. Try again." }, { status: 500 });
+      }
+      uploadedPaths.push(objectPath);
+      paths.push(objectPath);
     }
-    uploadedPaths.push(objectPath);
+    idCardPathsByTraveler.push(paths);
   }
 
   const { data: checkin, error: checkinError } = await supabase
@@ -112,7 +149,7 @@ export async function POST(request: NextRequest) {
     input.traveler_name.map((name, index) => ({
       checkin_id: checkin.id,
       name,
-      id_card_path: uploadedPaths[index],
+      id_card_paths: idCardPathsByTraveler[index],
       sort_order: index,
     }))
   );

@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { AssignBedForm } from "@/components/checkins/AssignBedForm";
 import { RejectCheckinButton } from "@/components/checkins/RejectCheckinButton";
+import { IdDocumentGallery } from "@/components/ui/IdDocumentGallery";
 
 export default async function CheckinDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -46,8 +47,10 @@ export default async function CheckinDetailPage({ params }: { params: Promise<{ 
 
   const signedUrlByPath = new Map<string, string>();
   for (const traveler of travelers ?? []) {
-    const { data } = await supabase.storage.from("id-cards").createSignedUrl(traveler.id_card_path, 300);
-    if (data?.signedUrl) signedUrlByPath.set(traveler.id_card_path, data.signedUrl);
+    for (const path of traveler.id_card_paths) {
+      const { data } = await supabase.storage.from("id-cards").createSignedUrl(path, 300);
+      if (data?.signedUrl) signedUrlByPath.set(path, data.signedUrl);
+    }
   }
 
   return (
@@ -84,7 +87,6 @@ export default async function CheckinDetailPage({ params }: { params: Promise<{ 
 
       <div className="flex flex-col gap-4">
         {(travelers ?? []).map((traveler, index) => {
-          const signedUrl = signedUrlByPath.get(traveler.id_card_path);
           return (
             <div
               key={traveler.id}
@@ -95,16 +97,15 @@ export default async function CheckinDetailPage({ params }: { params: Promise<{ 
                 {traveler.name}
               </h2>
 
-              {signedUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element -- private bucket, signed URL changes per request
-                <img
-                  src={signedUrl}
-                  alt={`${traveler.name}'s ID card`}
-                  className="mb-4 w-full rounded-xl border border-ink-navy/10"
+              <div className="mb-4">
+                <IdDocumentGallery
+                  documents={traveler.id_card_paths.map((path) => ({
+                    path,
+                    signedUrl: signedUrlByPath.get(path) ?? null,
+                  }))}
+                  altText={`${traveler.name}'s ID document`}
                 />
-              ) : (
-                <p className="mb-4 text-sm text-charcoal/60">Could not load the ID card image.</p>
-              )}
+              </div>
 
               {traveler.status === "pending" ? (
                 <>

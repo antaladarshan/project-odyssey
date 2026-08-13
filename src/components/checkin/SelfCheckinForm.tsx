@@ -139,7 +139,8 @@ export function SelfCheckinForm() {
 
       <div className="border-t border-white/10 pt-4">
         <span className={labelCls}>
-          Travelers — add everyone in your group, each needs their own ID photo
+          Travelers — add everyone in your group, each needs at least one ID
+          photo or PDF (front + back is fine — up to 5 files)
         </span>
         <div className="flex flex-col gap-4">
           {travelerKeys.map((key, index) => (
@@ -165,10 +166,10 @@ export function SelfCheckinForm() {
                   placeholder="Full name"
                 />
                 <input
-                  name="traveler_id_card"
+                  name={`traveler_id_card_${index}`}
                   type="file"
-                  accept="image/*"
-                  capture="environment"
+                  accept="image/*,application/pdf"
+                  multiple
                   required
                   className="w-full text-sm text-sky-tint file:mr-3 file:rounded-lg file:border-0 file:bg-odyssey-blue file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
                 />

@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { GuestProfileCard } from "@/components/guests/GuestProfileCard";
 import { GuestStayHistory, type StayHistoryItem } from "@/components/guests/GuestStayHistory";
+import { IdDocumentGallery } from "@/components/ui/IdDocumentGallery";
 
 export default async function GuestProfilePage({
   params,
@@ -37,9 +38,12 @@ export default async function GuestProfilePage({
   const roomBedById = new Map((roomsBeds ?? []).map((rb) => [rb.id, rb]));
   const channelById = new Map((channels ?? []).map((c) => [c.id, c]));
 
-  const { data: idCardSignedUrl } = guest.id_card_path
-    ? await supabase.storage.from("id-cards").createSignedUrl(guest.id_card_path, 300)
-    : { data: null };
+  const idDocuments = await Promise.all(
+    guest.id_card_paths.map(async (path) => {
+      const { data } = await supabase.storage.from("id-cards").createSignedUrl(path, 300);
+      return { path, signedUrl: data?.signedUrl ?? null };
+    })
+  );
 
   const stays: StayHistoryItem[] = (bookings ?? []).flatMap((booking) => {
     const channel = channelById.get(booking.channel_id);
@@ -65,15 +69,10 @@ export default async function GuestProfilePage({
 
       <GuestProfileCard name={guest.name} phone={guest.phone} email={guest.email} notes={guest.notes} />
 
-      {idCardSignedUrl?.signedUrl && (
+      {idDocuments.length > 0 && (
         <div className="rounded-2xl border border-ink-navy/10 bg-surface-white p-5 shadow-soft">
-          <h2 className="mb-3 font-serif text-lg text-ink-navy">ID card</h2>
-          {/* eslint-disable-next-line @next/next/no-img-element -- private bucket, signed URL changes per request */}
-          <img
-            src={idCardSignedUrl.signedUrl}
-            alt="Guest ID card"
-            className="w-full rounded-xl border border-ink-navy/10"
-          />
+          <h2 className="mb-3 font-serif text-lg text-ink-navy">ID documents</h2>
+          <IdDocumentGallery documents={idDocuments} altText="Guest ID document" />
         </div>
       )}
 

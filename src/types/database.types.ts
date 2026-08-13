@@ -125,7 +125,7 @@ export interface Database {
           email: string | null;
           id_proof_type: string | null;
           id_proof_number: string | null;
-          id_card_path: string | null;
+          id_card_paths: string[];
           notes: string | null;
           created_at: string;
           updated_at: string;
@@ -137,7 +137,7 @@ export interface Database {
           email?: string | null;
           id_proof_type?: string | null;
           id_proof_number?: string | null;
-          id_card_path?: string | null;
+          id_card_paths?: string[];
           notes?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -252,7 +252,7 @@ export interface Database {
           id: string;
           checkin_id: string;
           name: string;
-          id_card_path: string;
+          id_card_paths: string[];
           status: TravelerStatus;
           assigned_room_bed_id: string | null;
           booking_id: string | null;
@@ -264,7 +264,7 @@ export interface Database {
           id?: string;
           checkin_id: string;
           name: string;
-          id_card_path: string;
+          id_card_paths: string[];
           status?: TravelerStatus;
           assigned_room_bed_id?: string | null;
           booking_id?: string | null;

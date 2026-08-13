@@ -55,7 +55,7 @@ export async function assignTravelerToBedAction(
       name: traveler.name,
       email: checkin.email,
       phone: checkin.phone,
-      id_card_path: traveler.id_card_path,
+      id_card_paths: traveler.id_card_paths,
     })
     .select("id")
     .single();
