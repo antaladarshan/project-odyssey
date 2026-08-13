@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Plus, X } from "lucide-react";
 import { ADD_ON_OPTIONS } from "@/lib/validations/self-checkin";
+
+const MAX_FILES_PER_TRAVELER = 5;
 
 const inputCls =
   "w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-ice placeholder:text-sky-tint/40 focus:outline-none focus:border-odyssey-blue transition-colors";
@@ -16,6 +18,11 @@ function nextTravelerKey() {
 
 export function SelfCheckinForm() {
   const [travelerKeys, setTravelerKeys] = useState<string[]>(() => [nextTravelerKey()]);
+  // A native <input type="file" multiple> replaces its whole selection every
+  // time it's used, so picking the front then picking the back would silently
+  // drop the front. Files are tracked here instead and merged in on each pick,
+  // so travelers can build up front+back (or more) across several taps.
+  const [travelerFiles, setTravelerFiles] = useState<Record<string, File[]>>({});
   const [status, setStatus] = useState<"idle" | "submitting" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
@@ -28,15 +35,48 @@ export function SelfCheckinForm() {
 
   function removeTraveler(key: string) {
     setTravelerKeys((keys) => keys.filter((k) => k !== key));
+    setTravelerFiles((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }
+
+  function addFiles(key: string, e: ChangeEvent<HTMLInputElement>) {
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = ""; // reset so picking again fires onChange and doesn't just re-select the same files
+    if (picked.length === 0) return;
+    setTravelerFiles((prev) => ({
+      ...prev,
+      [key]: [...(prev[key] ?? []), ...picked].slice(0, MAX_FILES_PER_TRAVELER),
+    }));
+  }
+
+  function removeFile(key: string, fileIndex: number) {
+    setTravelerFiles((prev) => ({
+      ...prev,
+      [key]: (prev[key] ?? []).filter((_, i) => i !== fileIndex),
+    }));
   }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setStatus("submitting");
     setError(null);
     setFieldErrors({});
 
+    if (travelerKeys.some((key) => (travelerFiles[key]?.length ?? 0) === 0)) {
+      setError("Every traveler needs at least one ID photo or PDF");
+      return;
+    }
+
+    setStatus("submitting");
     const formData = new FormData(e.currentTarget);
+    travelerKeys.forEach((key, index) => {
+      for (const file of travelerFiles[key] ?? []) {
+        formData.append(`traveler_id_card_${index}`, file);
+      }
+    });
+
     const res = await fetch("/api/self-checkin", { method: "POST", body: formData });
     const body = await res.json().catch(() => ({}));
 
@@ -166,13 +206,39 @@ export function SelfCheckinForm() {
                   placeholder="Full name"
                 />
                 <input
-                  name={`traveler_id_card_${index}`}
                   type="file"
                   accept="image/*,application/pdf"
                   multiple
-                  required
+                  onChange={(e) => addFiles(key, e)}
                   className="w-full text-sm text-sky-tint file:mr-3 file:rounded-lg file:border-0 file:bg-odyssey-blue file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
                 />
+                {(travelerFiles[key]?.length ?? 0) > 0 ? (
+                  <ul className="flex flex-col gap-1.5">
+                    {travelerFiles[key]!.map((file, fileIndex) => (
+                      <li
+                        key={`${file.name}-${fileIndex}`}
+                        className="flex items-center justify-between gap-2 rounded-lg bg-white/5 px-2.5 py-1.5 text-xs text-sky-tint"
+                      >
+                        <span className="truncate">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeFile(key, fileIndex)}
+                          aria-label={`Remove ${file.name}`}
+                          className="shrink-0 text-sky-tint/60 hover:text-coral"
+                        >
+                          <X size={12} />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <p className="text-xs text-sky-tint/60">
+                  {(travelerFiles[key]?.length ?? 0) === 0
+                    ? "Front + back of an ID? Select both at once, or tap again to add another."
+                    : (travelerFiles[key]?.length ?? 0) < MAX_FILES_PER_TRAVELER
+                      ? "Tap the button again to add another file (e.g. the back of the ID)."
+                      : `Up to ${MAX_FILES_PER_TRAVELER} files reached.`}
+                </p>
               </div>
             </div>
           ))}
