@@ -70,5 +70,6 @@ insert into storage.buckets (id, name, public)
 values ('id-cards', 'id-cards', false)
 on conflict (id) do nothing;
 
+drop policy if exists "staff_read_id_cards" on storage.objects;
 create policy "staff_read_id_cards" on storage.objects for select
   using (bucket_id = 'id-cards' and auth.role() = 'authenticated');
