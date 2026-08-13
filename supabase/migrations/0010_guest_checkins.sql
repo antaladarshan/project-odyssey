@@ -67,7 +67,8 @@ grant insert on table public.guest_checkin_travelers to service_role;
 -- upload via a service-role Route Handler (bypasses storage RLS entirely),
 -- so no anon policy is needed here — only staff (authenticated) can read.
 insert into storage.buckets (id, name, public)
-values ('id-cards', 'id-cards', false);
+values ('id-cards', 'id-cards', false)
+on conflict (id) do nothing;
 
 create policy "staff_read_id_cards" on storage.objects for select
   using (bucket_id = 'id-cards' and auth.role() = 'authenticated');
