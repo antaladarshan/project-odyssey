@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { Suspense, lazy } from "react";
 import Hero from "@/components/sections/Hero";
 import Intro from "@/components/sections/Intro";
@@ -11,6 +12,13 @@ import FuturePropertiesTeaser from "@/components/sections/FuturePropertiesTeaser
 import Faq from "@/components/sections/Faq";
 
 const RouteLine = lazy(() => import("@/components/three/RouteLine"));
+
+export const metadata: Metadata = {
+  title: { absolute: "PG & Hostel in Satellite, Ahmedabad (Near ISRO) | Project Odyssey" },
+  description:
+    "Safe, comfortable PG and hostel stays in Satellite, Jodhpur Village, Ahmedabad — near ISRO SAC and Star Bazaar. Girls PG, co-ed PG and private dorms. Book direct.",
+  alternates: { canonical: "/" },
+};
 
 export default function HomePage() {
   return (

@@ -4,6 +4,7 @@ import Faq from "@/components/sections/Faq";
 export const metadata: Metadata = {
   title: "FAQ",
   description: "Frequently asked questions about staying at Project Odyssey — check-in, check-out, policies, and more.",
+  alternates: { canonical: "/faq/" },
 };
 
 export default function FaqPage() {

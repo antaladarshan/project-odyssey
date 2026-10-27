@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "Project Odyssey",
   tagline: "Begin Your Odyssey",
   description:
-    "A boutique backpacker hostel in Ahmedabad — private dorms, bunk beds, direct booking. No middleman, no markup. The journey starts here.",
+    "PG and hostel stays in Satellite, Ahmedabad, near ISRO and Star Bazaar — girls PG, co-ed PG and private dorms with AC, Wi-Fi and 24h security. Book direct, no middleman.",
   url: "https://projectodyssey.in",
   ogImage: "/brand/og-image.jpg",
   whatsapp: "+918511671066",

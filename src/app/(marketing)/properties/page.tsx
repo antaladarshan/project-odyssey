@@ -7,6 +7,7 @@ import { properties } from "@/config/property";
 export const metadata: Metadata = {
   title: "Our Properties",
   description: "Browse Project Odyssey hostels across India. Direct booking, no markup.",
+  alternates: { canonical: "/properties/" },
 };
 
 export default function PropertiesPage() {
@@ -66,7 +67,16 @@ export default function PropertiesPage() {
                     <MapPin size={11} /> {prop.city}, India
                   </p>
                   <h2 className="font-display font-bold text-lg text-ice">{prop.name}</h2>
-                  <p className="text-sm text-sky-tint/80 line-clamp-2">{prop.description}</p>
+                  <p className="text-sm text-sky-tint/80 line-clamp-3">{prop.description}</p>
+                  {prop.comingSoon && prop.highlights && (
+                    <ul className="flex flex-wrap gap-1.5 mt-1">
+                      {prop.highlights.map((h) => (
+                        <li key={h} className="text-[11px] text-odyssey-blue border border-odyssey-blue/30 rounded-full px-2 py-0.5">
+                          {h}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   {!prop.comingSoon && (
                     <p className="text-xs text-odyssey-blue font-semibold mt-1">
                       From ₹700/bed/night →

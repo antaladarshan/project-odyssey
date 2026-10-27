@@ -18,6 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${prop.name} ${prop.city} — Book Direct`,
     description: prop.description,
+    alternates: { canonical: `/property/${prop.slug}/` },
   };
 }
 

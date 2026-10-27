@@ -38,6 +38,8 @@ export interface PropertyConfig {
   mapsUrl?: string;
   comingSoon?: boolean;
   tag?: string;
+  /** Short bullet list shown on the properties card (e.g. planned room types). */
+  highlights?: string[];
 }
 
 // ── Active property ────────────────────────────────────────────────────────────
@@ -59,6 +61,22 @@ export const property: PropertyConfig = {
 // ── All properties (active + coming soon) ────────────────────────────────────
 export const properties: PropertyConfig[] = [
   property,
+  {
+    id: "prop-a102",
+    slug: "project-odyssey-ahmedabad-a-102",
+    name: "Project Odyssey A-102",
+    city: "Ahmedabad",
+    address: "A-102, Aishwarya Apartments, Jodhpur Village, Ahmedabad, Gujarat 380015",
+    description:
+      "Our second stay in the same building, Flat A-102, Aishwarya Apartments, Jodhpur Village. Smaller 3-4 sharing and 1-2 sharing rooms, close to ISRO and Star Bazaar.",
+    heroMedia: "/brand/mascot-rear.png",
+    lat: 23.0246061,
+    lng: 72.5233259,
+    mapsUrl: "https://maps.app.goo.gl/LbiucnPctPXGrzLH9",
+    comingSoon: true,
+    tag: "Coming Soon",
+    highlights: ["3-4 sharing rooms", "1-2 sharing rooms"],
+  },
   {
     id: "prop-02",
     slug: "project-odyssey-mumbai",

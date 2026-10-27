@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: { default: "Project Odyssey", template: "%s | Project Odyssey" },
   description: "Unified booking manager for Project Odyssey",
   manifest: "/manifest.webmanifest",
+  robots: { index: false, follow: false },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

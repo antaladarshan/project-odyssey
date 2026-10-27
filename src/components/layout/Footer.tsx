@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Share2, Mail, MessageCircle } from "lucide-react";
 import LogoPlaceholder from "./LogoPlaceholder";
 import { siteConfig } from "@/config/site";
+import { landingPages } from "@/config/landing";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
 
 export default function Footer() {
@@ -46,6 +47,18 @@ export default function Footer() {
               {l.label}
             </Link>
           ))}
+        </div>
+
+        {/* Local SEO links */}
+        <div className="flex flex-col gap-3 md:col-start-2 md:row-start-2">
+          <h4 className="text-xs font-semibold tracking-widest uppercase text-odyssey-blue">PG &amp; Hostel in Ahmedabad</h4>
+          <div className="flex flex-wrap gap-x-5 gap-y-2">
+            {landingPages.map((p) => (
+              <Link key={p.slug} href={`/pg/${p.slug}/`} className="text-sm hover:text-odyssey-blue transition-colors">
+                {p.label}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Contact + Book */}

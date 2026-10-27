@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Bricolage_Grotesque, Newsreader, IBM_Plex_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
+import { lodgingSchema } from "@/lib/schema";
 import "./globals.css";
 
 const inter = Inter({
@@ -62,40 +63,6 @@ export const metadata: Metadata = {
   },
 };
 
-// LodgingBusiness JSON-LD for Google Rich Results + local SEO
-const lodgingSchema = {
-  "@context": "https://schema.org",
-  "@type": "LodgingBusiness",
-  name: siteConfig.name,
-  description: siteConfig.description,
-  url: siteConfig.url,
-  telephone: siteConfig.whatsapp,
-  email: siteConfig.email,
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: siteConfig.address.street,
-    addressLocality: siteConfig.address.city,
-    addressRegion: siteConfig.address.state,
-    postalCode: siteConfig.address.pincode,
-    addressCountry: siteConfig.address.country,
-  },
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: siteConfig.address.lat,
-    longitude: siteConfig.address.lng,
-  },
-  image: [`${siteConfig.url}${siteConfig.ogImage}`],
-  priceRange: "₹₹",
-  checkinTime: siteConfig.checkIn,
-  checkoutTime: siteConfig.checkOut,
-  amenityFeature: [
-    { "@type": "LocationFeatureSpecification", name: "Free Wi-Fi", value: true },
-    { "@type": "LocationFeatureSpecification", name: "Air conditioning", value: true },
-    { "@type": "LocationFeatureSpecification", name: "Kitchen", value: true },
-    { "@type": "LocationFeatureSpecification", name: "Hot water", value: true },
-  ],
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -108,7 +75,7 @@ export default function RootLayout({
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(lodgingSchema()) }}
         />
       </head>
       <body className="min-h-full flex flex-col antialiased" suppressHydrationWarning>

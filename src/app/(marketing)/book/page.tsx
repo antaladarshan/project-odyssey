@@ -6,7 +6,9 @@ import { buildWhatsAppLink } from "@/lib/requestToBook";
 
 export const metadata: Metadata = {
   title: "Book Your Stay",
-  description: "Book directly at Project Odyssey, Pune. No middleman, no markup.",
+  description:
+    "Book a bed or private room directly at Project Odyssey, Satellite, Ahmedabad. No middleman, no markup.",
+  alternates: { canonical: "/book/" },
 };
 
 export default function BookPage() {

@@ -5,6 +5,7 @@ import { buildWhatsAppLink } from "@/lib/requestToBook";
 export const metadata: Metadata = {
   title: "Contact",
   description: "Get in touch with Project Odyssey. Book via WhatsApp or email.",
+  alternates: { canonical: "/contact/" },
 };
 
 export default function ContactPage() {

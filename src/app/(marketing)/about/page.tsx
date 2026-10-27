@@ -4,6 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Our Story",
   description: "The story behind Project Odyssey — a backpacker stay rooted in the spirit of the journey.",
+  alternates: { canonical: "/about/" },
 };
 
 export default function AboutPage() {
