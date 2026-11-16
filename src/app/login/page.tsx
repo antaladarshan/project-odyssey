@@ -1,7 +1,7 @@
 "use client";
 
+import LogoPlaceholder from "@/components/layout/LogoPlaceholder";
 import { useState, type FormEvent } from "react";
-import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -37,15 +37,8 @@ export default function LoginPage() {
       }}
     >
       <div className="w-full max-w-sm">
-        <div className="mx-auto mb-6 h-24 w-24 overflow-hidden rounded-2xl shadow-card">
-          <Image
-            src="/mascot.png"
-            alt=""
-            width={192}
-            height={192}
-            priority
-            className="h-full w-full object-cover"
-          />
+        <div className="mb-6 flex justify-center">
+          <LogoPlaceholder size="lg" />
         </div>
 
         <div className="rounded-2xl border border-ink-navy/10 bg-surface-white p-8 shadow-card">

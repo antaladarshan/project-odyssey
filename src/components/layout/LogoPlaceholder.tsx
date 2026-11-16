@@ -3,44 +3,37 @@
 import Image from "next/image";
 
 interface LogoPlaceholderProps {
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
+  /** Kept for backwards compatibility — the official logo already contains the wordmark. */
   showWordmark?: boolean;
+  /** Turn off the looping playful animation. */
+  still?: boolean;
   className?: string;
 }
 
-const sizes = {
-  sm: { mascot: 30, text: "text-sm" },
-  md: { mascot: 38, text: "text-base" },
-  lg: { mascot: 52, text: "text-xl" },
-};
+// Official logo (public/brand/logo.png) is 2702×536 — never recolor or redraw it.
+const RATIO = 2702 / 536;
+const heights = { xs: 30, sm: 36, md: 44, lg: 60 } as const;
 
 export default function LogoPlaceholder({
   size = "md",
-  showWordmark = true,
+  still = false,
   className = "",
 }: LogoPlaceholderProps) {
-  const s = sizes[size];
+  const h = heights[size];
+  const w = Math.round(h * RATIO);
 
   return (
-    <div className={`flex items-center gap-2 select-none ${className}`}>
+    <div className={`select-none inline-flex ${className}`}>
       <Image
-        src="/brand/mascot.png"
+        src="/brand/logo.png"
         alt="Project Odyssey"
-        width={s.mascot}
-        height={s.mascot}
-        className="object-contain drop-shadow-[0_0_8px_rgba(88,176,224,0.45)]"
+        width={w}
+        height={h}
         priority
+        className={`object-contain ${still ? "" : "logo-playful"}`}
+        style={{ height: h, width: "auto" }}
       />
-      {showWordmark && (
-        <div className="font-display font-bold leading-none">
-          <span className={`block tracking-[0.25em] font-light opacity-60 text-ice ${size === "sm" ? "text-[8px]" : "text-[10px]"}`}>
-            PROJECT
-          </span>
-          <span className={`block tracking-tight gradient-text ${s.text}`}>
-            ODYSSEY
-          </span>
-        </div>
-      )}
     </div>
   );
 }

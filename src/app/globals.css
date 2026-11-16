@@ -218,6 +218,30 @@ body {
   box-shadow: 4px 4px 0 var(--color-po-pink);
 }
 
+/* Playful always-on logo animation: idle bob + squash-and-hop + wiggle.
+   Only transform is animated — the logo's colours/design are never touched. */
+.logo-playful {
+  transform-origin: 50% 90%;
+  animation: logo-playful 5s ease-in-out infinite;
+  will-change: transform;
+}
+.logo-playful:hover {
+  animation-duration: 1.6s;
+}
+@keyframes logo-playful {
+  0%, 100% { transform: translateY(0) rotate(0) scale(1, 1); }
+  15%      { transform: translateY(-3px) rotate(-1.5deg) scale(1.01, 1.01); }
+  30%      { transform: translateY(0) rotate(0) scale(1.03, 0.94); }   /* squash */
+  40%      { transform: translateY(-9px) rotate(2deg) scale(0.97, 1.06); } /* hop */
+  52%      { transform: translateY(0) rotate(-2deg) scale(1.03, 0.95); }
+  60%      { transform: translateY(-2px) rotate(1.5deg) scale(1, 1); }
+  70%      { transform: translateY(0) rotate(-1deg) scale(1, 1); }
+  85%      { transform: translateY(-2px) rotate(0.5deg) scale(1, 1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-playful { animation: none; }
+}
+
 /* "Your Next / Hostel Destination" headline pattern */
 .headline-script {
   font-family: var(--font-script), cursive;
