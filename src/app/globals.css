@@ -45,6 +45,16 @@
   --font-sans:    var(--font-inter);
   --font-serif:   var(--font-newsreader);
   --font-mono:    var(--font-ibm-plex-mono);
+  --font-condensed: var(--font-bebas);
+  --font-script:    var(--font-caveat);
+
+  /* Light redesign palette (marketing site) */
+  --color-po-pink:      #f43f5e;
+  --color-po-pink-dark: #e11d48;
+  --color-po-yellow:    #ffd23f;
+  --color-po-cream:     #fff8f0;
+  --color-po-ink:       #1f2937;
+  --color-po-indigo:    #4338ca;
 
   /* Original brand colors */
   --color-odyssey-blue: var(--odyssey-blue);
@@ -162,6 +172,58 @@ body {
   background: var(--ink);
   border-color: rgba(255,255,255,0.08);
   color: var(--ice);
+}
+
+/* ── Marketing light redesign ─────────────────────────────────
+   Scoped to .marketing-light (set in the (marketing) layout). Remaps the
+   old dark tokens so existing components flip to light automatically.
+   To revert: remove the class from the layout (or delete this block). */
+.marketing-light {
+  --abyss: #ffffff;
+  --ink: #ffffff;
+  --cloud: #ffffff;
+  --ice: #1f2937;
+  --sky-tint: #4b5563;
+  --odyssey-blue: #f43f5e;
+  --azure-deep: #e11d48;
+  --mascot-glow: #fb7185;
+  --bg-surface: #ffffff;
+  --bg-surface-2: #fff8f0;
+  --fg-text: #1f2937;
+  --fg-muted: #4b5563;
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
+.marketing-light .gradient-text {
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--color-po-pink);
+}
+
+/* Tilted sticker label with hard offset shadow */
+.sticker {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  color: #fff;
+  background: var(--color-po-pink);
+  box-shadow: 4px 4px 0 var(--color-po-yellow);
+  transform: rotate(-3deg);
+}
+.sticker-yellow {
+  color: var(--color-po-ink);
+  background: var(--color-po-yellow);
+  box-shadow: 4px 4px 0 var(--color-po-pink);
+}
+
+/* "Your Next / Hostel Destination" headline pattern */
+.headline-script {
+  font-family: var(--font-script), cursive;
+  font-size: 1.75em;
+  line-height: 1;
+  color: var(--color-po-ink);
 }
 
 /* ── PMS (app) surface — always light, independent of the
