@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   Wifi, Wind, Droplets, Lock, Blinds, Lamp, Plug, UtensilsCrossed, Sofa, ShieldCheck, WashingMachine, MapPin,
   type LucideIcon,
@@ -24,9 +25,21 @@ export default function Amenities() {
             const Icon = icons[a.icon];
             return (
               <div key={a.label} className="flex flex-col items-center gap-3 text-center group">
-                <span className="grid place-items-center w-16 h-16 rounded-2xl bg-po-pink/10 text-po-pink group-hover:bg-po-pink group-hover:text-white group-hover:-translate-y-1 transition-all duration-300">
-                  <Icon size={30} strokeWidth={1.6} />
-                </span>
+                {a.image ? (
+                  <Image
+                    src={a.image}
+                    alt={a.label}
+                    width={96}
+                    height={96}
+                    className="h-24 w-24 object-contain group-hover:-translate-y-1.5 transition-transform duration-300"
+                  />
+                ) : (
+                  <span className="grid place-items-center h-24 w-24">
+                    <span className="grid place-items-center w-16 h-16 rounded-2xl bg-[#f1ebe2] text-[#6b6358] group-hover:-translate-y-1.5 transition-transform duration-300">
+                      <Icon size={30} strokeWidth={1.6} />
+                    </span>
+                  </span>
+                )}
                 <span className="text-xs sm:text-sm text-gray-600 font-medium leading-tight">{a.label}</span>
               </div>
             );

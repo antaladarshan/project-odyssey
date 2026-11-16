@@ -161,20 +161,21 @@ export const travelStyle = {
 };
 
 // ── Amenities (lucide icon keys are resolved in Amenities.tsx) ──────────────
-export const amenityGrid = [
-  { icon: "Wifi", label: "High-Speed Wi-Fi" },
-  { icon: "Wind", label: "Air Conditioning" },
-  { icon: "Droplets", label: "Hot Water" },
+// `image` = 3D illustration in /public/amenities; others fall back to a lucide icon.
+export const amenityGrid: readonly { icon: string; label: string; image?: string }[] = [
+  { icon: "Wifi", label: "High-Speed Wi-Fi", image: "/amenities/wifi.webp" },
+  { icon: "Wind", label: "Air Conditioning", image: "/amenities/acs.webp" },
+  { icon: "Droplets", label: "Hot Water (Geysers)", image: "/amenities/geyser.webp" },
+  { icon: "Blinds", label: "Privacy Curtains", image: "/amenities/curtains.webp" },
+  { icon: "Sofa", label: "Spacious Common Areas", image: "/amenities/common.webp" },
   { icon: "Lock", label: "Personal Lockers" },
-  { icon: "Blinds", label: "Privacy Curtains" },
   { icon: "Lamp", label: "Reading Lights" },
   { icon: "Plug", label: "Bedside Power Sockets" },
   { icon: "UtensilsCrossed", label: "Shared Kitchen" },
-  { icon: "Sofa", label: "Spacious Common Area" },
   { icon: "ShieldCheck", label: "24h Security" },
   { icon: "WashingMachine", label: "Laundry Access" },
   { icon: "MapPin", label: "Central Location" },
-] as const;
+];
 
 // ── Team offsites banner ────────────────────────────────────────────────────
 export const offsite = {
