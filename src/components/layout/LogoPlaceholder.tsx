@@ -6,8 +6,6 @@ interface LogoPlaceholderProps {
   size?: "xs" | "sm" | "nav" | "md" | "lg";
   /** Kept for backwards compatibility — the official logo already contains the wordmark. */
   showWordmark?: boolean;
-  /** Turn off the looping playful animation. */
-  still?: boolean;
   className?: string;
 }
 
@@ -17,7 +15,6 @@ const heights = { xs: 30, sm: 36, nav: 40, md: 44, lg: 60 } as const;
 
 export default function LogoPlaceholder({
   size = "md",
-  still = false,
   className = "",
 }: LogoPlaceholderProps) {
   const h = heights[size];
@@ -31,7 +28,7 @@ export default function LogoPlaceholder({
         width={w}
         height={h}
         priority
-        className={`object-contain ${still ? "" : "logo-playful"}`}
+        className="object-contain"
         style={{ height: h, width: "auto" }}
       />
     </div>

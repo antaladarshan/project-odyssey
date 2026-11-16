@@ -21,14 +21,14 @@ export default function Hero() {
 
         {/* Left stickers */}
         <div className="absolute left-[1%] top-[24%] sm:top-[27%] z-10 flex flex-col items-start text-[clamp(0.85rem,1.5vw,1.85rem)]">
-          <span className="sticker -rotate-[4deg]">More than just a bed</span>
-          <span className="sticker ml-[8%] -mt-1 -rotate-[1deg]">It&apos;s an experience</span>
+          <span className="sticker sticker-float -rotate-[4deg]">More than just a bed</span>
+          <span className="sticker sticker-float ml-[8%] -mt-1 -rotate-[1deg]" style={{ animationDelay: "0.6s" }}>It&apos;s an experience</span>
         </div>
 
         {/* Right stickers */}
         <div className="absolute right-[3%] lg:right-[8%] top-[24%] sm:top-[28%] z-10 flex flex-col items-end text-[clamp(0.85rem,1.5vw,1.85rem)]">
-          <span className="sticker sticker-yellow">Near ISRO SAC</span>
-          <span className="sticker sticker-yellow -mt-1 -rotate-[4deg]">From ₹700 / night</span>
+          <span className="sticker sticker-yellow sticker-float" style={{ animationDelay: "1.2s" }}>Near ISRO SAC</span>
+          <span className="sticker sticker-yellow sticker-float -mt-1 -rotate-[4deg]" style={{ animationDelay: "1.8s" }}>From ₹700 / night</span>
         </div>
 
         {/* Headline */}
