@@ -209,8 +209,10 @@ export default function BookingWidget({ className = "" }: { className?: string }
                   maxHeight: "calc(100dvh - 16px)",
                   overflowY: "auto",
                   zIndex: 60,
+                  backgroundColor: "transparent",
                 }}
-                className="origin-top"
+                // Portaled to <body>, outside the layout's `marketing-light` scope — re-apply it.
+                className="origin-top marketing-light"
               >
                 <DateRangePicker
                   value={{ checkIn, checkOut }}

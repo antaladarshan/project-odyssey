@@ -17,11 +17,11 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/60" />
 
         {/* Stickers */}
-        <div className="absolute left-3 sm:left-10 top-28 sm:top-36 flex flex-col items-start gap-1 z-10">
+        <div className="absolute left-3 sm:left-10 top-8 sm:top-14 flex flex-col items-start gap-1 z-10">
           <span className="sticker text-sm sm:text-2xl">More than just a bed</span>
           <span className="sticker sticker-yellow text-xs sm:text-xl ml-4">It&apos;s an experience</span>
         </div>
-        <div className="absolute right-3 sm:right-10 top-28 sm:top-36 flex flex-col items-end gap-1 z-10">
+        <div className="absolute right-3 sm:right-10 top-8 sm:top-14 flex flex-col items-end gap-1 z-10">
           <span className="sticker sticker-yellow text-sm sm:text-2xl">Near ISRO SAC</span>
           <span className="sticker text-xs sm:text-xl mr-4">From ₹700 / night</span>
         </div>

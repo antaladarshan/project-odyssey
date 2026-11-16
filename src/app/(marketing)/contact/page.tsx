@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   const waHref = buildWhatsAppLink({});
   return (
-    <div className="min-h-screen bg-abyss pt-24 pb-16 px-4 sm:px-6">
+    <div className="min-h-screen bg-abyss pt-10 pb-16 px-4 sm:px-6">
       <div className="max-w-xl mx-auto flex flex-col gap-8">
         <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">Get in Touch</p>
         <h1 className="font-display font-bold text-4xl text-ice">Contact Us</h1>

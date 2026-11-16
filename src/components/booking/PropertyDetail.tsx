@@ -106,7 +106,7 @@ export default function PropertyDetail({ property }: Props) {
 
   if (reviewing) {
     return (
-      <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6">
+      <div className="min-h-screen pt-10 pb-16 px-4 sm:px-6">
         <ReviewBooking
           checkIn={search.checkIn}
           checkOut={search.checkOut}

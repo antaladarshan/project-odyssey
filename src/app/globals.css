@@ -201,6 +201,24 @@ body {
   color: var(--color-po-pink);
 }
 
+/* Old dark-theme "white at low opacity" borders/fills are invisible on light.
+   Re-map them (exact class tokens, so hover: variants are untouched). */
+.marketing-light [class~="border-white/6"],
+.marketing-light [class~="border-white/8"],
+.marketing-light [class~="border-white/10"],
+.marketing-light [class~="border-white/15"] {
+  border-color: #e5e7eb;
+}
+.marketing-light [class~="bg-white/3"],
+.marketing-light [class~="bg-white/5"],
+.marketing-light [class~="bg-white/10"] {
+  background-color: #f9fafb;
+}
+.marketing-light [class~="hover:bg-white/5"]:hover,
+.marketing-light [class~="hover:bg-white/10"]:hover {
+  background-color: #f3f4f6;
+}
+
 /* Tilted sticker label with hard offset shadow */
 .sticker {
   display: inline-block;

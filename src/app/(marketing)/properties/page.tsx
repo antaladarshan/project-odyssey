@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function PropertiesPage() {
   return (
-    <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6">
+    <div className="min-h-screen pt-10 pb-16 px-4 sm:px-6">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-10 flex flex-col gap-2">
