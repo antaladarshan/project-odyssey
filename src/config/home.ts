@@ -161,20 +161,31 @@ export const travelStyle = {
 };
 
 // ── Amenities (lucide icon keys are resolved in Amenities.tsx) ──────────────
-// `image` = 3D illustration in /public/amenities; others fall back to a lucide icon.
-export const amenityGrid: readonly { icon: string; label: string; image?: string }[] = [
-  { icon: "Wifi", label: "High-Speed Wi-Fi", image: "/amenities/wifi.webp" },
-  { icon: "Wind", label: "Air Conditioning", image: "/amenities/acs.webp" },
-  { icon: "Droplets", label: "Hot Water (Geysers)", image: "/amenities/geyser.webp" },
-  { icon: "Blinds", label: "Privacy Curtains", image: "/amenities/curtains.webp" },
-  { icon: "Sofa", label: "Spacious Common Areas", image: "/amenities/common.webp" },
-  { icon: "Lock", label: "Personal Lockers" },
-  { icon: "Lamp", label: "Reading Lights" },
-  { icon: "Plug", label: "Bedside Power Sockets" },
-  { icon: "UtensilsCrossed", label: "Shared Kitchen" },
-  { icon: "ShieldCheck", label: "24h Security" },
-  { icon: "WashingMachine", label: "Laundry Access" },
-  { icon: "MapPin", label: "Central Location" },
+// 3D illustrations in /public/amenities, same order/labels as the reference.
+// NOTE(owner): confirm each of these is something Odyssey really offers (power backup,
+// 24/7 front desk, co-working stations, 24/7 café, water dispenser) — delete any that aren't.
+export const amenityGrid: readonly { label: string; image: string }[] = [
+  { label: "High Speed WiFi", image: "/amenities/wifi.webp" },
+  { label: "Power Backup", image: "/amenities/powerbackup.webp" },
+  { label: "24/7 Front Desk", image: "/amenities/frontdesk.webp" },
+  { label: "Lockers", image: "/amenities/bluetoothlocks.webp" },
+  { label: "Privacy Curtains", image: "/amenities/curtains.webp" },
+  { label: "Co-working Stations", image: "/amenities/coworking.webp" },
+  { label: "Water Dispensers", image: "/amenities/dispenser.webp" },
+  { label: "24/7 Café", image: "/amenities/cafe.webp" },
+  { label: "Air conditioning", image: "/amenities/acs.webp" },
+  { label: "Geysers", image: "/amenities/geyser.webp" },
+  { label: "Spacious common areas", image: "/amenities/common.webp" },
+];
+
+// Real Odyssey extras without an illustration — shown as a text line under the grid.
+export const amenityExtras = [
+  "Reading lights",
+  "Bedside power sockets",
+  "Shared kitchen",
+  "24h security",
+  "Laundry access",
+  "Central location",
 ];
 
 // ── Team offsites banner ────────────────────────────────────────────────────
