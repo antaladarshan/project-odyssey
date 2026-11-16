@@ -2,9 +2,13 @@
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Plus, X } from "lucide-react";
-import { ADD_ON_OPTIONS } from "@/lib/validations/self-checkin";
-
-const MAX_FILES_PER_TRAVELER = 5;
+import { createClient } from "@/lib/supabase/client";
+import {
+  ADD_ON_OPTIONS,
+  MAX_ID_FILE_BYTES,
+  MAX_ID_FILES_PER_TRAVELER as MAX_FILES_PER_TRAVELER,
+  isAllowedIdCardType,
+} from "@/lib/validations/self-checkin";
 
 const inputCls =
   "w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-ice placeholder:text-sky-tint/40 focus:outline-none focus:border-odyssey-blue transition-colors";
@@ -23,7 +27,8 @@ export function SelfCheckinForm() {
   // drop the front. Files are tracked here instead and merged in on each pick,
   // so travelers can build up front+back (or more) across several taps.
   const [travelerFiles, setTravelerFiles] = useState<Record<string, File[]>>({});
-  const [status, setStatus] = useState<"idle" | "submitting" | "done">("idle");
+  const [status, setStatus] = useState<"idle" | "uploading" | "submitting" | "done">("idle");
+  const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
 
@@ -69,25 +74,86 @@ export function SelfCheckinForm() {
       return;
     }
 
-    setStatus("submitting");
-    const formData = new FormData(e.currentTarget);
-    travelerKeys.forEach((key, index) => {
+    for (const key of travelerKeys) {
       for (const file of travelerFiles[key] ?? []) {
-        formData.append(`traveler_id_card_${index}`, file);
+        if (!isAllowedIdCardType(file.type)) {
+          setError(`"${file.name}" isn't an image or PDF`);
+          return;
+        }
+        if (file.size > MAX_ID_FILE_BYTES) {
+          setError(`"${file.name}" is larger than 8 MB — please use a smaller file`);
+          return;
+        }
       }
-    });
-
-    const res = await fetch("/api/self-checkin", { method: "POST", body: formData });
-    const body = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      setStatus("idle");
-      setError(body.error ?? "Something went wrong. Try again.");
-      setFieldErrors(body.fieldErrors ?? {});
-      return;
     }
 
-    setStatus("done");
+    const formEl = e.currentTarget;
+    const fail = (message: string, errors: Record<string, string[]> = {}) => {
+      setStatus("idle");
+      setError(message);
+      setFieldErrors(errors);
+    };
+
+    try {
+      // 1) Ask the server for signed upload URLs (also validates file metadata).
+      const flat = travelerKeys.flatMap((key, travelerIndex) =>
+        (travelerFiles[key] ?? []).map((file) => ({ travelerIndex, file }))
+      );
+      setUploadProgress({ done: 0, total: flat.length });
+      setStatus("uploading");
+
+      const urlRes = await fetch("/api/self-checkin/upload-urls", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          files: flat.map(({ travelerIndex, file }) => ({
+            travelerIndex,
+            name: file.name,
+            type: file.type,
+            size: file.size,
+          })),
+        }),
+      });
+      const urlBody = await urlRes.json().catch(() => ({}));
+      if (!urlRes.ok) {
+        return fail(
+          urlBody.error ?? urlBody.fieldErrors?.traveler_id_card?.[0] ?? "Could not start the upload. Try again.",
+          urlBody.fieldErrors ?? {}
+        );
+      }
+
+      // 2) Upload straight from the browser to Storage, in parallel.
+      const supabase = createClient();
+      const uploads: { travelerIndex: number; path: string; token: string }[] = urlBody.uploads;
+      let done = 0;
+      await Promise.all(
+        uploads.map(async (upload, i) => {
+          const { error: uploadError } = await supabase.storage
+            .from("id-cards")
+            .uploadToSignedUrl(upload.path, upload.token, flat[i].file, {
+              contentType: flat[i].file.type,
+            });
+          if (uploadError) throw new Error(`Could not upload "${flat[i].file.name}". Try again.`);
+          done += 1;
+          setUploadProgress({ done, total: flat.length });
+        })
+      );
+
+      // 3) Submit the form fields plus the uploaded object paths.
+      setStatus("submitting");
+      const formData = new FormData(formEl);
+      for (const upload of uploads) {
+        formData.append(`traveler_id_card_paths_${upload.travelerIndex}`, upload.path);
+      }
+      const res = await fetch("/api/self-checkin", { method: "POST", body: formData });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        return fail(body.error ?? "Something went wrong. Try again.", body.fieldErrors ?? {});
+      }
+      setStatus("done");
+    } catch (err) {
+      fail(err instanceof Error ? err.message : "Something went wrong. Try again.");
+    }
   }
 
   if (status === "done") {
@@ -263,10 +329,14 @@ export function SelfCheckinForm() {
 
       <button
         type="submit"
-        disabled={status === "submitting"}
+        disabled={status === "uploading" || status === "submitting"}
         className="mt-2 flex items-center justify-center gap-2 rounded-xl bg-odyssey-blue px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-azure-deep disabled:opacity-60"
       >
-        {status === "submitting" ? "Submitting…" : "Check in"}
+        {status === "uploading"
+          ? `Uploading IDs (${uploadProgress.done}/${uploadProgress.total})…`
+          : status === "submitting"
+            ? "Submitting…"
+            : "Check in"}
       </button>
     </form>
   );

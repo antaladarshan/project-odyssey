@@ -13,17 +13,14 @@ export default async function CheckinDetailPage({ params }: { params: Promise<{ 
   const { data: checkin } = await supabase.from("guest_checkins").select("*").eq("id", id).single();
   if (!checkin) notFound();
 
-  const { data: travelers } = await supabase
-    .from("guest_checkin_travelers")
-    .select("*")
-    .eq("checkin_id", id)
-    .order("sort_order");
-
-  const { data: beds } = await supabase
-    .from("rooms_beds")
-    .select("id, label")
-    .eq("room_type_id", checkin.room_type_id)
-    .order("sort_order");
+  const [{ data: travelers }, { data: beds }] = await Promise.all([
+    supabase.from("guest_checkin_travelers").select("*").eq("checkin_id", id).order("sort_order"),
+    supabase
+      .from("rooms_beds")
+      .select("id, label")
+      .eq("room_type_id", checkin.room_type_id)
+      .order("sort_order"),
+  ]);
 
   const bedIds = (beds ?? []).map((b) => b.id);
 
@@ -45,12 +42,15 @@ export default async function CheckinDetailPage({ params }: { params: Promise<{ 
 
   const unavailableBedIds = [...new Set((overlapping ?? []).map((b) => b.room_bed_id))];
 
+  // One batched call for every ID file instead of one request per file.
+  const allPaths = (travelers ?? []).flatMap((t) => t.id_card_paths);
+  const { data: signedUrls } =
+    allPaths.length > 0
+      ? await supabase.storage.from("id-cards").createSignedUrls(allPaths, 300)
+      : { data: [] };
   const signedUrlByPath = new Map<string, string>();
-  for (const traveler of travelers ?? []) {
-    for (const path of traveler.id_card_paths) {
-      const { data } = await supabase.storage.from("id-cards").createSignedUrl(path, 300);
-      if (data?.signedUrl) signedUrlByPath.set(path, data.signedUrl);
-    }
+  for (const entry of signedUrls ?? []) {
+    if (entry.path && entry.signedUrl) signedUrlByPath.set(entry.path, entry.signedUrl);
   }
 
   return (

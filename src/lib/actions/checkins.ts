@@ -19,11 +19,15 @@ export async function assignTravelerToBedAction(
 
   const supabase = await createClient();
 
-  const { data: traveler } = await supabase
-    .from("guest_checkin_travelers")
-    .select("*")
-    .eq("id", travelerId)
-    .single();
+  // Traveler and channel are independent lookups; run them together.
+  const [{ data: traveler }, { data: directChannel }] = await Promise.all([
+    supabase
+      .from("guest_checkin_travelers")
+      .select("*")
+      .eq("id", travelerId)
+      .single(),
+    supabase.from("channels").select("id").eq("name", "Direct Website").single(),
+  ]);
 
   if (!traveler || traveler.status !== "pending") {
     return { error: "This traveler has already been handled." };
@@ -38,12 +42,6 @@ export async function assignTravelerToBedAction(
   if (!checkin) {
     return { error: "Could not find this check-in." };
   }
-
-  const { data: directChannel } = await supabase
-    .from("channels")
-    .select("id")
-    .eq("name", "Direct Website")
-    .single();
 
   if (!directChannel) {
     return { error: "Could not find the Direct Website channel." };

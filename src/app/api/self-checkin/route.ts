@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServiceClient } from "@/lib/supabase/service";
-import { selfCheckinSchema } from "@/lib/validations/self-checkin";
+import {
+  ID_CARD_PATH_PATTERN,
+  MAX_ID_FILES_PER_TRAVELER,
+  selfCheckinSchema,
+} from "@/lib/validations/self-checkin";
 
 function isValidISODate(value: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value).getTime());
-}
-
-const MAX_FILE_BYTES = 8 * 1024 * 1024;
-const MAX_FILES_PER_TRAVELER = 5;
-
-function isAllowedIdCardType(type: string): boolean {
-  return type.startsWith("image/") || type === "application/pdf";
 }
 
 export async function POST(request: NextRequest) {
@@ -37,55 +34,27 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  // traveler_name is an array; each traveler's file(s) come in under their
-  // own indexed field (traveler_id_card_0, traveler_id_card_1, ...) since a
-  // traveler can now attach more than one file and a single shared field
-  // name would lose the traveler boundary once `multiple` is involved.
-  const idCardsByTraveler = input.traveler_name.map((_, index) =>
-    formData.getAll(`traveler_id_card_${index}`)
+  // Files are uploaded by the browser straight to Storage (see
+  // /api/self-checkin/upload-urls); this route only receives the object
+  // paths, one indexed field per traveler (traveler_id_card_paths_0, ...).
+  const idCardPathsByTraveler = input.traveler_name.map((_, index) =>
+    formData.getAll(`traveler_id_card_paths_${index}`).map(String)
   );
+  const fail = (message: string) =>
+    NextResponse.json({ fieldErrors: { traveler_id_card: [message] } }, { status: 400 });
 
-  for (const files of idCardsByTraveler) {
-    if (files.length === 0) {
-      return NextResponse.json(
-        { fieldErrors: { traveler_id_card: ["Every traveler needs at least one ID photo or PDF"] } },
-        { status: 400 }
-      );
+  for (const paths of idCardPathsByTraveler) {
+    if (paths.length === 0) return fail("Every traveler needs at least one ID photo or PDF");
+    if (paths.length > MAX_ID_FILES_PER_TRAVELER) {
+      return fail(`Upload at most ${MAX_ID_FILES_PER_TRAVELER} files per traveler`);
     }
-    if (files.length > MAX_FILES_PER_TRAVELER) {
-      return NextResponse.json(
-        {
-          fieldErrors: {
-            traveler_id_card: [`Upload at most ${MAX_FILES_PER_TRAVELER} files per traveler`],
-          },
-        },
-        { status: 400 }
-      );
+    if (paths.some((path) => !ID_CARD_PATH_PATTERN.test(path))) {
+      return fail("Upload a photo or PDF of each traveler's ID");
     }
-    for (const file of files) {
-      if (!(file instanceof File) || file.size === 0) {
-        return NextResponse.json(
-          { fieldErrors: { traveler_id_card: ["Upload a photo or PDF of each traveler's ID"] } },
-          { status: 400 }
-        );
-      }
-      if (file.size > MAX_FILE_BYTES) {
-        return NextResponse.json(
-          {
-            fieldErrors: {
-              traveler_id_card: ["A file is too large — please use a smaller image or PDF"],
-            },
-          },
-          { status: 400 }
-        );
-      }
-      if (!isAllowedIdCardType(file.type)) {
-        return NextResponse.json(
-          { fieldErrors: { traveler_id_card: ["Upload image or PDF files only"] } },
-          { status: 400 }
-        );
-      }
-    }
+  }
+  const uploadedPaths = idCardPathsByTraveler.flat();
+  if (new Set(uploadedPaths).size !== uploadedPaths.length) {
+    return fail("Upload a photo or PDF of each traveler's ID");
   }
 
   const supabase = createServiceClient();
@@ -100,31 +69,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Check-in is not available right now." }, { status: 500 });
   }
 
-  const uploadedPaths: string[] = [];
-  const idCardPathsByTraveler: string[][] = [];
-  for (const [travelerIndex, files] of idCardsByTraveler.entries()) {
-    const paths: string[] = [];
-    for (const file of files as File[]) {
-      const extension = file.name.includes(".") ? file.name.split(".").pop() : "jpg";
-      const objectPath = `${crypto.randomUUID()}.${extension}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from("id-cards")
-        .upload(objectPath, file, { contentType: file.type });
-
-      if (uploadError) {
-        console.error("[self-checkin] storage upload failed", {
-          travelerIndex,
-          fileName: file.name,
-          uploadError,
-        });
-        if (uploadedPaths.length > 0) await supabase.storage.from("id-cards").remove(uploadedPaths);
-        return NextResponse.json({ error: "Could not upload an ID card. Try again." }, { status: 500 });
-      }
-      uploadedPaths.push(objectPath);
-      paths.push(objectPath);
-    }
-    idCardPathsByTraveler.push(paths);
+  // Make sure every referenced file really landed in Storage.
+  const { data: signed, error: signError } = await supabase.storage
+    .from("id-cards")
+    .createSignedUrls(uploadedPaths, 60);
+  if (signError || !signed || signed.some((entry) => !entry.signedUrl)) {
+    return NextResponse.json(
+      { error: "An ID upload did not finish. Please try again." },
+      { status: 400 }
+    );
   }
 
   const { data: checkin, error: checkinError } = await supabase
