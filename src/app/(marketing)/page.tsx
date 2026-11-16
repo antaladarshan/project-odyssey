@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense, lazy } from "react";
 import Hero from "@/components/sections/Hero";
 import Intro from "@/components/sections/Intro";
 import Rooms from "@/components/sections/Rooms";
@@ -11,8 +10,6 @@ import ReturningGuest from "@/components/sections/ReturningGuest";
 import FuturePropertiesTeaser from "@/components/sections/FuturePropertiesTeaser";
 import Faq from "@/components/sections/Faq";
 
-const RouteLine = lazy(() => import("@/components/three/RouteLine"));
-
 export const metadata: Metadata = {
   title: { absolute: "PG & Hostel in Satellite, Ahmedabad (Near ISRO) | Project Odyssey" },
   description:
@@ -23,10 +20,6 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
-      <Suspense fallback={null}>
-        <RouteLine />
-      </Suspense>
-
       <Hero />
       <Intro />
       <Rooms />
