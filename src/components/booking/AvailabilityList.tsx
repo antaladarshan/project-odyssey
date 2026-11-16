@@ -85,6 +85,7 @@ function RoomCard({
           src={room.images[0]}
           alt={displayName}
           fill
+          quality={90}
           className="object-cover"
           sizes="(max-width: 640px) 100vw, 192px"
         />

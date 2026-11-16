@@ -1,5 +1,6 @@
 import Image from "next/image";
 import BookingWidget from "@/components/ui/BookingWidget";
+import { photo } from "@/config/photos";
 
 // Layout copied from the reference hero: nav floats transparently over the photo,
 // stickers sit at ~27% of the hero height (left pink pair, right yellow pair),
@@ -9,12 +10,13 @@ export default function Hero() {
     <section id="hero" className="relative">
       <div className="relative h-[78svh] min-h-[600px] overflow-hidden bg-po-ink">
         <Image
-          src="/gallery/room-2a.webp"
-          alt="Bunk beds with privacy curtains at Project Odyssey, Ahmedabad"
+          src={photo.superhost}
+          alt="Living area at Project Odyssey, Ahmedabad — an Airbnb Superhost stay"
           fill
           priority
           sizes="100vw"
-          className="object-cover"
+          quality={90}
+          className="object-cover object-[50%_14%]"
         />
         {/* light scrim: just enough for the white nav + headline to read */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/10 to-black/20" />

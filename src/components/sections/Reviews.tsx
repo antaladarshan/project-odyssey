@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
 import { reviews } from "@/config/property";
+import { photo } from "@/config/photos";
 
 export default function Reviews() {
   const [idx, setIdx] = useState(0);
@@ -24,7 +25,7 @@ export default function Reviews() {
         {/* Polaroid */}
         <div className="mx-auto bg-white p-3 pb-10 shadow-xl rotate-[-4deg] max-w-xs w-full">
           <div className="relative aspect-square">
-            <Image src="/gallery/room-1a.webp" alt="Guests' favourite room at Project Odyssey" fill sizes="320px" className="object-cover" />
+            <Image src={photo.bunkLadder} alt="Guests' favourite room at Project Odyssey" fill quality={90} sizes="320px" className="object-cover" />
           </div>
           <p className="headline-script !text-2xl text-center mt-3">Loved by travellers</p>
         </div>

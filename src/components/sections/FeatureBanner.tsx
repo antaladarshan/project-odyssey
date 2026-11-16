@@ -18,7 +18,7 @@ export default function FeatureBanner() {
           </Link>
         </div>
         <div className="relative min-h-[260px] md:min-h-[360px]">
-          <Image src={f.image} alt={f.title} fill sizes="(max-width: 768px) 100vw, 60vw" className="object-cover" />
+          <Image src={f.image} alt={f.title} fill quality={90} sizes="(max-width: 768px) 100vw, 60vw" className="object-cover" />
         </div>
       </div>
     </section>

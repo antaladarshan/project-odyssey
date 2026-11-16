@@ -26,7 +26,7 @@ export default function PageHeroBanner({
           {children && <div className="flex flex-wrap gap-3 mt-1">{children}</div>}
         </div>
         <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl">
-          <Image src={image} alt="" fill priority sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+          <Image src={image} alt="" fill priority quality={90} sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
         </div>
       </div>
     </section>

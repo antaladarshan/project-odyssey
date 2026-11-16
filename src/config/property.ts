@@ -1,3 +1,4 @@
+import { photo } from "./photos";
 export type RoomType = "mixed_dorm" | "dorm" | "whole_flat";
 
 export interface Room {
@@ -52,7 +53,7 @@ export const property: PropertyConfig = {
   description:
     "A 3-room backpacker hostel in the heart of Ahmedabad. Bunk beds, privacy curtains, fast Wi-Fi, and a community of fellow travelers — all without the OTA markup.",
   heroMedia: "/brand/mascot-rear.png",
-  images: ["/gallery/room-1a.webp", "/gallery/room-2a.webp", "/gallery/room-3a.webp"],
+  images: [photo.livingSofa, photo.bunkLadder, photo.balcony, photo.dining, photo.bathroom, photo.curtainAisle],
   lat: 23.0246061,
   lng: 72.5233259,
   mapsUrl: "https://maps.app.goo.gl/LbiucnPctPXGrzLH9",
@@ -132,7 +133,7 @@ export const rooms: Room[] = [
     capacity: 4,
     basePricePerBedPerNight: 700,
     wholeRoomPerNight: 3000,
-    images: ["/gallery/room-2a.webp"],
+    images: [photo.bunkLadder, photo.bunksWide],
     amenities: ["Wi-Fi", "AC", "Privacy Curtain", "Reading Light", "Locker", "Hot Water"],
     description:
       "A cozy 4-bed bunk dorm with privacy curtains, personal reading lights, under-bed lockers, and AC. Perfect for solo travelers and small groups.",
@@ -151,7 +152,7 @@ export const rooms: Room[] = [
     capacity: 4,
     basePricePerBedPerNight: 700,
     wholeRoomPerNight: 3000,
-    images: ["/gallery/room-1a.webp"],
+    images: [photo.bunksLit, photo.bunksDeep],
     amenities: ["Wi-Fi", "AC", "Privacy Curtain", "Reading Light", "Locker", "Hot Water"],
     description:
       "Sister room to The Explorer — same 4-bed bunk setup with curtains and personal lighting. The window-side beds get Ahmedabad morning light.",
@@ -169,7 +170,7 @@ export const rooms: Room[] = [
     capacity: 6,
     basePricePerBedPerNight: 700,
     wholeRoomPerNight: 5000,
-    images: ["/gallery/room-3a.webp"],
+    images: [photo.curtainAisle, photo.bunksDeep],
     amenities: ["Wi-Fi", "AC", "Privacy Curtain", "Reading Light", "Locker", "Hot Water"],
     description:
       "Our 6-bed dormitory — the social heart of Project Odyssey. Three bunk pairs, privacy curtains on every bed, shared locker row. Best value, best stories.",

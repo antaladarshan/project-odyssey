@@ -18,6 +18,7 @@ export default function HoverExpandRow({ items }: { items: ExpandItem[] }) {
             src={it.image}
             alt={it.label}
             fill
+            quality={90}
             sizes="(max-width: 1024px) 100vw, 50vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-105 group-focus-visible:scale-105"
           />

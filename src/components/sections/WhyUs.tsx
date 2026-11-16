@@ -69,6 +69,7 @@ export default function WhyUs() {
                     src={c.image}
                     alt={c.title}
                     fill
+                    quality={90}
                     sizes="300px"
                     className="object-cover transition-transform duration-700 group-hover:scale-105 group-focus-visible:scale-105"
                   />

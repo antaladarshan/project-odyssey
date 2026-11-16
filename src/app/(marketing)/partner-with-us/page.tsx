@@ -5,6 +5,7 @@ import SectionHeading from "@/components/ui/SectionHeading";
 import CtaBand from "@/components/ui/CtaBand";
 import Faq from "@/components/sections/Faq";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
+import { photo } from "@/config/photos";
 
 export const metadata: Metadata = {
   title: "Partner with Project Odyssey",
@@ -54,7 +55,7 @@ export default function PartnerWithUsPage() {
         title="Turn your property into a"
         accent="Project Odyssey."
         text="You bring the space. We bring the brand, the guests and the know-how to run it well."
-        image="/gallery/room-1a.webp"
+        image={photo.livingSofa}
       >
         <a
           href={enquiry}
@@ -136,7 +137,7 @@ export default function PartnerWithUsPage() {
         text="Tell us about your property and we'll take it from there."
         buttonLabel="Partner with us"
         href={enquiry}
-        image="/gallery/room-3a.webp"
+        image={photo.curtainAisle}
       />
     </>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { effectiveNightly } from "@/lib/pricing";
 import { useLivePricing, FALLBACK_BASE_RATE } from "@/lib/useLivePricing";
 import SectionHeading from "@/components/ui/SectionHeading";
+import { photo } from "@/config/photos";
 
 const fmt = (n: number) => n.toLocaleString("en-IN");
 
@@ -14,8 +15,8 @@ export default function LongStays() {
   const base = rates.length > 0 ? Math.min(...rates) : FALLBACK_BASE_RATE;
 
   const cards = [
-    { title: "Workation", blurb: "Work remotely from a bed with a light, Wi-Fi and AC.", nights: 7, label: "7+ nights", image: "/gallery/room-1a.webp" },
-    { title: "Monthly stay", blurb: "No lock-in drama — the longer you stay, the less you pay.", nights: 27, label: "27+ nights", image: "/gallery/room-3a.webp" },
+    { title: "Workation", blurb: "Work remotely from a bed with a light, Wi-Fi and AC.", nights: 7, label: "7+ nights", image: photo.bunkLadder },
+    { title: "Monthly stay", blurb: "No lock-in drama — the longer you stay, the less you pay.", nights: 27, label: "27+ nights", image: photo.livingSofa },
   ];
 
   return (
@@ -30,7 +31,7 @@ export default function LongStays() {
               className="group rounded-t-[10rem] rounded-b-3xl overflow-hidden bg-po-cream shadow-md hover:shadow-xl transition-shadow flex flex-col"
             >
               <div className="relative h-64">
-                <Image src={c.image} alt={c.title} fill sizes="(max-width: 640px) 100vw, 50vw"
+                <Image src={c.image} alt={c.title} fill quality={90} sizes="(max-width: 640px) 100vw, 50vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-700" />
                 <span className="absolute top-4 left-1/2 -translate-x-1/2 bg-po-yellow text-po-ink text-xs font-bold px-3 py-1 rounded-full">
                   From ₹{fmt(effectiveNightly(c.nights, live.config, base))} / night

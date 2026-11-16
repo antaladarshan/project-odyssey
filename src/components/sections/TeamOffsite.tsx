@@ -20,7 +20,7 @@ export default function TeamOffsite() {
           </a>
         </div>
         <div className="relative aspect-[4/3] rounded-3xl overflow-hidden border-4 border-white shadow-xl rotate-2">
-          <Image src={offsite.image} alt="Group stay at Project Odyssey" fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
+          <Image src={offsite.image} alt="Group stay at Project Odyssey" fill quality={90} sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
         </div>
       </div>
     </section>

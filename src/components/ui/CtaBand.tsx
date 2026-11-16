@@ -32,7 +32,7 @@ export default function CtaBand({
           </a>
         </div>
         <div className="relative min-h-[220px]">
-          <Image src={image} alt="" fill sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
+          <Image src={image} alt="" fill quality={90} sizes="(max-width: 768px) 100vw, 40vw" className="object-cover" />
         </div>
       </div>
     </section>

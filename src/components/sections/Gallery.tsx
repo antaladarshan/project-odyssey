@@ -18,6 +18,7 @@ export default function Gallery() {
                 src={t.image}
                 alt={t.label}
                 fill
+                quality={90}
                 sizes="(max-width: 640px) 100vw, 33vw"
                 className="object-cover group-hover:scale-105 transition-transform duration-700"
               />

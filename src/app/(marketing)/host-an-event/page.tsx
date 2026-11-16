@@ -5,6 +5,7 @@ import PageHeroBanner from "@/components/ui/PageHeroBanner";
 import SectionHeading from "@/components/ui/SectionHeading";
 import CtaBand from "@/components/ui/CtaBand";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
+import { photo } from "@/config/photos";
 
 export const metadata: Metadata = {
   title: "Host an Event at Project Odyssey, Ahmedabad",
@@ -28,13 +29,13 @@ const whyBlocks = [
     icon: MapPin,
     title: "Right in the middle of Ahmedabad",
     text: "We're in Satellite, Jodhpur Village — close to ISRO SAC, Star Bazaar, SG Highway and the metro, so your guests can get here easily.",
-    image: "/gallery/room-2a.webp",
+    image: photo.balcony,
   },
   {
     icon: Users,
     title: "A curious, young community",
     text: "Backpackers, students, interns and remote workers stay with us all year round — an audience that loves meeting new people and trying new things.",
-    image: "/gallery/room-3a.webp",
+    image: photo.livingBeanbags,
   },
 ];
 
@@ -45,7 +46,7 @@ export default function HostAnEventPage() {
         title="Host an Event at"
         accent="Project Odyssey"
         text="Ready to put on a show and find the right venue? Our common area in Satellite, Ahmedabad is open to community events, workshops and meetups."
-        image="/gallery/room-3a.webp"
+        image={photo.movieNight}
       >
         <a
           href={enquiry}
@@ -64,7 +65,7 @@ export default function HostAnEventPage() {
           {whyBlocks.map((b, i) => (
             <div key={b.title} className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
               <div className={`relative aspect-[4/3] rounded-3xl overflow-hidden shadow-lg ${i % 2 ? "md:order-2" : ""}`}>
-                <Image src={b.image} alt={b.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                <Image src={b.image} alt={b.title} fill quality={90} sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
               </div>
               <div className="flex flex-col gap-3 md:px-6">
                 <span className="grid place-items-center w-12 h-12 rounded-full bg-po-pink/10 text-po-pink">
@@ -136,7 +137,7 @@ export default function HostAnEventPage() {
         text="Send us a message with the date and what you have in mind — we'll get back to you."
         buttonLabel="Message us"
         href={enquiry}
-        image="/gallery/room-2a.webp"
+        image={photo.livingSofa}
       />
     </>
   );

@@ -25,6 +25,7 @@ export default function PropertyShowcase() {
                 src={p.image}
                 alt={p.name}
                 fill
+                quality={90}
                 sizes="(max-width: 640px) 100vw, 50vw"
                 className={`object-cover transition-transform duration-700 group-hover:scale-105 ${p.comingSoon ? "saturate-75" : ""}`}
               />

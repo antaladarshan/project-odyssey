@@ -44,6 +44,7 @@ export default function PropertiesPage() {
                     src={prop.heroMedia}
                     alt={`${prop.name} ${prop.city}`}
                     fill
+                    quality={90}
                     className="object-cover"
                     sizes="(max-width: 640px) 100vw, 33vw"
                   />

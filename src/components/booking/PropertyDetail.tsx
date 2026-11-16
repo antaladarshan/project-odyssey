@@ -135,6 +135,7 @@ export default function PropertyDetail({ property }: Props) {
               src={img}
               alt={`${property.name} photo ${i + 1}`}
               fill
+              quality={90}
               className="object-cover hover:scale-105 transition-transform duration-700"
               sizes="(max-width: 640px) 50vw, 33vw"
               priority={i === 0}
