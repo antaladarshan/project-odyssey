@@ -24,7 +24,7 @@ export default function Nav() {
   const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setPastHero(window.scrollY > window.innerHeight * 0.6);
+    const onScroll = () => setPastHero(window.scrollY > 60);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -43,11 +43,16 @@ export default function Nav() {
   // Home: transparent, floating over the hero photo (white text) until the hero is
   // scrolled past. Every other page has no photo behind the nav, so it is solid white.
   const overHero = isHome && !pastHero && !open;
+  // Scrolled (or menu open): frosted glass instead of a flat white bar.
+  const glass =
+    "bg-white/60 backdrop-blur-xl backdrop-saturate-150 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.06)]";
   const headerCls = isHome
-    ? `fixed top-0 inset-x-0 z-50 transition-[background-color,box-shadow] duration-300 ${
-        overHero ? "bg-transparent" : "bg-white shadow-md shadow-black/10"
+    ? `fixed top-0 inset-x-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300 ${
+        overHero ? "bg-transparent" : glass
       }`
-    : "sticky top-0 z-50 bg-white border-b border-gray-100";
+    : `sticky top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300 ${
+        pastHero || open ? glass : "bg-white border-b border-gray-100"
+      }`;
 
   const linkCls = overHero
     ? "text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.45)] hover:text-po-yellow"
@@ -56,12 +61,12 @@ export default function Nav() {
   return (
     <>
       <header className={headerCls}>
-        <nav className="mx-auto h-20 lg:h-24 px-4 sm:px-6 lg:px-[3.6vw] flex items-center justify-between gap-4">
+        <nav className="mx-auto h-16 lg:h-[72px] px-4 sm:px-6 lg:px-[3.6vw] flex items-center justify-between gap-4">
           <Link href="/" aria-label="Project Odyssey home" onClick={() => setOpen(false)} className="shrink-0">
             <LogoPlaceholder size="nav" />
           </Link>
 
-          <ul className="hidden lg:flex items-center gap-8 text-[17px] font-semibold">
+          <ul className="hidden lg:flex items-center gap-6 text-[15px] font-semibold">
             {navLinks.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className={`transition-colors ${linkCls}`}>
@@ -71,22 +76,22 @@ export default function Nav() {
             ))}
           </ul>
 
-          <div className="hidden lg:flex items-center gap-4 shrink-0">
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
             <a
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center gap-2 h-14 px-6 rounded-full text-base font-semibold transition-colors ${
+              className={`inline-flex items-center gap-1.5 h-10 px-4 rounded-full text-sm font-semibold transition-colors ${
                 overHero
                   ? "bg-white text-po-ink hover:bg-po-yellow"
                   : "bg-white text-po-ink border border-gray-200 hover:border-po-pink hover:text-po-pink"
               }`}
             >
-              <MessageCircle size={18} /> WhatsApp
+              <MessageCircle size={15} /> WhatsApp
             </a>
             <Link
               href="/property/project-odyssey-ahmedabad/"
-              className="inline-flex items-center h-14 px-7 rounded-full bg-po-pink hover:bg-po-pink-dark text-white text-base font-bold transition-colors"
+              className="inline-flex items-center h-10 px-5 rounded-full bg-po-pink hover:bg-po-pink-dark text-white text-sm font-bold transition-colors"
             >
               {labels.nav.book}
             </Link>
@@ -99,14 +104,14 @@ export default function Nav() {
               aria-expanded={open}
               className={`p-2 transition-colors ${overHero ? "text-white" : "text-po-ink"}`}
             >
-              {open ? <X size={26} /> : <Menu size={26} />}
+              {open ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </nav>
 
         {open && (
           <div
-            className="lg:hidden bg-white border-t border-gray-100 px-5 py-5 flex flex-col gap-3 shadow-lg"
+            className="lg:hidden border-t border-white/40 px-5 py-5 flex flex-col gap-3 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {navLinks.map((l) => (

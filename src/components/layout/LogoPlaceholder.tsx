@@ -11,7 +11,7 @@ interface LogoPlaceholderProps {
 
 // Official logo (public/brand/logo.png) is 2702×536 — never recolor or redraw it.
 const RATIO = 2702 / 536;
-const heights = { xs: 30, sm: 36, nav: 40, md: 44, lg: 60 } as const;
+const heights = { xs: 30, sm: 36, nav: 32, md: 44, lg: 60 } as const;
 
 export default function LogoPlaceholder({
   size = "md",
@@ -28,8 +28,9 @@ export default function LogoPlaceholder({
         width={w}
         height={h}
         priority
-        className="object-contain"
-        style={{ height: h, width: "auto" }}
+        // nav logo is smaller on mobile (h-6) than desktop (h-8); other sizes are fixed.
+        className={`object-contain w-auto ${size === "nav" ? "h-6 lg:h-8" : ""}`}
+        style={size === "nav" ? undefined : { height: h }}
       />
     </div>
   );
