@@ -11,7 +11,7 @@ export default function Amenities() {
           title="Our Hostel Amenities & Facilities"
           sub="Comfort matters, especially when you are away from home. Project Odyssey gives you all the essentials you'd expect from a modern, affordable stay, including:"
         />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-10">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-x-4 gap-y-10">
           {amenityGrid.map((a) => (
             <div key={a.label} className="flex flex-col items-center gap-3 text-center group">
               <Image

@@ -176,6 +176,10 @@ export const amenityGrid: readonly { label: string; image: string }[] = [
   { label: "Air conditioning", image: "/amenities/acs.webp" },
   { label: "Geysers", image: "/amenities/geyser.webp" },
   { label: "Spacious common areas", image: "/amenities/common.webp" },
+  // Generated in-house in the same style (not from the reference site).
+  { label: "Projector", image: "/amenities/projector.webp" },
+  { label: "Laundry", image: "/amenities/laundry.webp" },
+  { label: "Iron", image: "/amenities/iron.webp" },
 ];
 
 // Real Odyssey extras without an illustration — shown as a text line under the grid.
@@ -184,7 +188,6 @@ export const amenityExtras = [
   "Bedside power sockets",
   "Shared kitchen",
   "24h security",
-  "Laundry access",
   "Central location",
 ];
 
