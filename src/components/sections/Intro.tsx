@@ -15,9 +15,10 @@ export default function Intro() {
           </span>
         </h2>
         <p className="text-gray-600 text-base sm:text-lg leading-relaxed">
-          Project Odyssey is a backpacker hostel in Satellite that gets the details right — bunk beds
-          with privacy curtains, fast Wi-Fi, personal lockers on every bed and a shared kitchen that
-          actually works. No OTA markup, no middleman. Just book direct and arrive.
+          From the quiet lanes of Jodhpur Village to the buzz of SG Highway, Project Odyssey puts you
+          in the middle of Ahmedabad — close to ISRO SAC, Star Bazaar and the metro. Choose a bunk in a
+          dorm or take a whole room, with privacy curtains, personal lockers and a shared common area to
+          meet fellow travellers. Book direct, no middleman.
         </p>
         <div className="grid grid-cols-3 gap-4 mt-4">
           {stats.map((s) => (

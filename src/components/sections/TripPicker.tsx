@@ -3,8 +3,8 @@ import { BedDouble, Users } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 const options = [
-  { icon: <BedDouble size={26} />, title: "A bed in a dorm", sub: "From ₹700 / night, with curtain + locker", href: "/property/project-odyssey-ahmedabad/" },
-  { icon: <Users size={26} />, title: "A whole room", sub: "4 or 6 beds, all to yourselves", href: "/property/project-odyssey-ahmedabad/" },
+  { icon: <BedDouble size={26} />, title: "Project Odyssey", sub: "Satellite, Ahmedabad — beds from ₹700 / night", href: "/property/project-odyssey-ahmedabad/", cta: "Book →" },
+  { icon: <Users size={26} />, title: "Project Odyssey 2.0", sub: "Our next stay — coming soon", href: "/properties/", cta: "Learn more →" },
 ];
 
 export default function TripPicker() {
@@ -24,7 +24,7 @@ export default function TripPicker() {
                 <p className="font-display font-bold text-lg text-po-ink">{o.title}</p>
                 <p className="text-sm text-gray-600">{o.sub}</p>
               </div>
-              <span className="text-po-pink font-bold text-sm group-hover:translate-x-1 transition-transform">Book →</span>
+              <span className="text-po-pink font-bold text-sm group-hover:translate-x-1 transition-transform whitespace-nowrap">{o.cta}</span>
             </Link>
           ))}
         </div>

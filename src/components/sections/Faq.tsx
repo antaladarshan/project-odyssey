@@ -5,7 +5,15 @@ import { Plus } from "lucide-react";
 import { faqs } from "@/config/property";
 import SectionHeading from "@/components/ui/SectionHeading";
 
-export default function Faq() {
+export default function Faq({
+  items = faqs,
+  script = "Frequently asked",
+  title = "Questions",
+}: {
+  items?: { q: string; a: string }[];
+  script?: string;
+  title?: string;
+}) {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
@@ -13,13 +21,13 @@ export default function Faq() {
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[2fr_3fr] gap-10">
         <SectionHeading
           align="left"
-          script="Frequently asked"
-          title="Questions"
+          script={script}
+          title={title}
           sub="Answers to common questions about our stay, booking and prices."
         />
 
         <div className="flex flex-col divide-y divide-gray-200 bg-white rounded-3xl px-6 shadow-sm">
-          {faqs.map((faq, i) => (
+          {items.map((faq, i) => (
             <div key={i}>
               <button
                 onClick={() => setOpen(open === i ? null : i)}

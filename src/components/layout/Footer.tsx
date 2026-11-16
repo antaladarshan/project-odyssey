@@ -45,6 +45,8 @@ export default function Footer() {
             { label: "The Stay", href: "/property/project-odyssey-ahmedabad/" },
             { label: "Our Story", href: "/about" },
             { label: "Blog", href: "/blog" },
+            { label: "Host an Event", href: "/host-an-event/" },
+            { label: "Partner with us", href: "/partner-with-us/" },
             { label: "FAQ", href: "/faq" },
             { label: "Contact", href: "/contact" },
           ].map((l) => (
