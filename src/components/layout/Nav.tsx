@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, MessageCircle } from "lucide-react";
 import LogoPlaceholder from "./LogoPlaceholder";
 import { labels } from "@/config/labels";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
@@ -20,12 +20,13 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close menu on route change / outside click
+  // Close menu on outside click
   useEffect(() => {
     if (!open) return;
     const close = () => setOpen(false);
@@ -33,64 +34,65 @@ export default function Nav() {
     return () => document.removeEventListener("click", close);
   }, [open]);
 
-  const bookHref = buildWhatsAppLink({});
+  const whatsappHref = buildWhatsAppLink({});
 
   return (
     <>
       <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-abyss/95 backdrop-blur-md border-b border-white/8 shadow-lg shadow-black/30"
-            : "bg-transparent"
+        className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${
+          scrolled ? "shadow-md shadow-black/10" : "border-b border-gray-100"
         }`}
       >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
-          {/* Logo */}
+        <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <Link href="/" aria-label="Project Odyssey home" onClick={() => setOpen(false)}>
             <LogoPlaceholder size="sm" />
           </Link>
 
-          {/* Desktop links */}
-          <ul className="hidden md:flex items-center gap-6 text-sm font-medium text-sky-tint/80">
+          <ul className="hidden md:flex items-center gap-7 text-sm font-semibold text-po-ink">
             {navLinks.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="hover:text-odyssey-blue hover:text-opacity-100 transition-colors">
+                <Link href={l.href} className="hover:text-po-pink transition-colors">
                   {l.label}
                 </Link>
               </li>
             ))}
           </ul>
 
-          {/* Desktop actions */}
           <div className="hidden md:flex items-center gap-2">
-            <Link href="/account" className="text-sm text-sky-tint hover:text-odyssey-blue transition-colors px-3 py-1.5">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-po-ink border border-gray-200 hover:border-po-pink hover:text-po-pink px-4 py-2 rounded-full transition-colors"
+            >
+              <MessageCircle size={15} /> WhatsApp
+            </a>
+            <Link href="/account" className="text-sm font-semibold text-po-ink hover:text-po-pink transition-colors px-3 py-2">
               {labels.nav.account}
             </Link>
             <Link
               href="/property/project-odyssey-ahmedabad/"
-              className="bg-odyssey-blue hover:bg-azure-deep text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors"
+              className="bg-po-pink hover:bg-po-pink-dark text-white text-sm font-bold px-6 py-2.5 rounded-full transition-colors"
             >
               {labels.nav.book}
             </Link>
           </div>
 
-          {/* Mobile burger */}
           <div className="md:hidden flex items-center gap-1">
             <button
               onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
               aria-label="Toggle menu"
               aria-expanded={open}
-              className="p-2 text-sky-tint hover:text-odyssey-blue transition-colors"
+              className="p-2 text-po-ink hover:text-po-pink transition-colors"
             >
               {open ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
         </nav>
 
-        {/* Mobile dropdown */}
         {open && (
           <div
-            className="md:hidden bg-ink/98 backdrop-blur-md border-t border-white/8 px-5 py-5 flex flex-col gap-3"
+            className="md:hidden bg-white border-t border-gray-100 px-5 py-5 flex flex-col gap-3 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {navLinks.map((l) => (
@@ -98,7 +100,7 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="text-sky-tint hover:text-odyssey-blue text-base font-medium transition-colors py-1"
+                className="text-po-ink hover:text-po-pink text-base font-semibold transition-colors py-1"
               >
                 {l.label}
               </Link>
@@ -106,13 +108,13 @@ export default function Nav() {
             <Link
               href="/account"
               onClick={() => setOpen(false)}
-              className="text-sky-tint hover:text-odyssey-blue text-base font-medium transition-colors py-1"
+              className="text-po-ink hover:text-po-pink text-base font-semibold transition-colors py-1"
             >
               {labels.nav.account}
             </Link>
             <Link
               href="/property/project-odyssey-ahmedabad/"
-              className="mt-2 bg-odyssey-blue hover:bg-azure-deep text-white text-center font-semibold py-3.5 rounded-2xl transition-colors text-base block"
+              className="mt-2 bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-base block"
               onClick={() => setOpen(false)}
             >
               {labels.nav.book}
@@ -122,10 +124,10 @@ export default function Nav() {
       </header>
 
       {/* Mobile sticky bottom Book bar */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-abyss/95 backdrop-blur-md border-t border-white/8 safe-area-inset-bottom">
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 safe-area-inset-bottom">
         <Link
           href="/property/project-odyssey-ahmedabad/"
-          className="flex items-center justify-center gap-2 w-full bg-odyssey-blue hover:bg-azure-deep text-white text-center font-semibold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
+          className="flex items-center justify-center gap-2 w-full bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
         >
           {labels.hero.cta}
         </Link>
