@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Image from "next/image";
+import LogoPlaceholder from "./LogoPlaceholder";
 import { Share2, Mail, MessageCircle, MapPin } from "lucide-react";
 import { siteConfig } from "@/config/site";
 import { landingPages } from "@/config/landing";
@@ -8,7 +8,7 @@ import { buildWhatsAppLink } from "@/lib/requestToBook";
 const linkCls = "text-sm text-white/80 hover:text-po-yellow transition-colors";
 const headCls = "text-xs font-bold tracking-widest uppercase text-po-yellow";
 const iconBtn =
-  "p-2.5 rounded-full bg-white/10 hover:bg-po-yellow hover:text-po-ink text-white transition-colors";
+  "p-2.5 rounded-full bg-[rgba(255,255,255,0.14)] hover:bg-po-yellow hover:text-po-ink text-white transition-colors";
 
 export default function Footer() {
   const bookHref = buildWhatsAppLink({});
@@ -18,9 +18,9 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
         {/* Brand + follow */}
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <Image src="/brand/mascot.png" alt="Project Odyssey" width={38} height={38} className="object-contain" />
-            <span className="font-display font-extrabold text-lg tracking-tight">Project Odyssey</span>
+          {/* official logo is blue — sits on a white pill so it stays readable on indigo */}
+          <div className="self-start rounded-2xl bg-white px-4 py-2.5">
+            <LogoPlaceholder size="sm" />
           </div>
           <p className="text-sm leading-relaxed text-white/75">{siteConfig.description}</p>
           <h4 className={`${headCls} mt-2`}>Follow us</h4>
@@ -87,7 +87,7 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-white/10">
+      <div className="border-t border-[rgba(255,255,255,0.14)]">
         <div className="px-4 sm:px-6 py-5 max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/60">
           <span>© {new Date().getFullYear()} Project Odyssey. All rights reserved.</span>
           <span>Made with care in Ahmedabad, India.</span>
