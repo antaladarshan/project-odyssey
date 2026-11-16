@@ -4,26 +4,22 @@ import { labels } from "@/config/labels";
 
 export default function ReturningGuest() {
   return (
-    <section className="py-12 sm:py-20 px-4 sm:px-6 bg-abyss border-y border-white/5">
-      <div className="max-w-3xl mx-auto text-center flex flex-col items-center gap-5">
-        <div className="p-3 rounded-full bg-odyssey-blue/10 border border-odyssey-blue/20">
-          <RotateCcw size={22} className="text-odyssey-blue" />
+    <section className="py-10 px-4 sm:px-6 bg-white">
+      <div className="max-w-4xl mx-auto rounded-3xl bg-po-cream px-6 py-8 flex flex-col sm:flex-row items-center gap-5 justify-between text-center sm:text-left">
+        <div className="flex items-center gap-4">
+          <span className="grid place-items-center w-12 h-12 rounded-full bg-white text-po-pink shrink-0">
+            <RotateCcw size={20} />
+          </span>
+          <div>
+            <h2 className="font-display font-bold text-xl text-po-ink">{labels.returningGuest.heading}</h2>
+            <p className="text-sm text-gray-600">{labels.returningGuest.sub}</p>
+          </div>
         </div>
-        <h2 className="font-display font-bold text-2xl sm:text-3xl text-ice">
-          {labels.returningGuest.heading}
-        </h2>
-        <p className="text-sky-tint text-base sm:text-lg">{labels.returningGuest.sub}</p>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Link
-            href="/account"
-            className="bg-odyssey-blue hover:bg-azure-deep text-white font-semibold px-8 py-3 rounded-full transition-colors"
-          >
+        <div className="flex gap-3 shrink-0">
+          <Link href="/account" className="bg-po-pink hover:bg-po-pink-dark text-white font-bold px-6 py-2.5 rounded-full transition-colors text-sm">
             {labels.returningGuest.cta}
           </Link>
-          <Link
-            href="/login"
-            className="border border-white/15 hover:border-odyssey-blue text-sky-tint hover:text-odyssey-blue font-semibold px-8 py-3 rounded-full transition-colors"
-          >
+          <Link href="/login" className="border border-gray-300 hover:border-po-pink hover:text-po-pink font-semibold px-6 py-2.5 rounded-full transition-colors text-sm">
             Sign In
           </Link>
         </div>

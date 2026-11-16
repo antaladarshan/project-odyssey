@@ -101,7 +101,7 @@ export default function Rooms() {
   })).filter((t) => t.discount);
 
   return (
-    <section id="rooms" className="py-14 sm:py-24 px-4 sm:px-6 bg-ink">
+    <section id="rooms" className="py-14 sm:py-24 px-4 sm:px-6 bg-po-cream">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-14 flex flex-col gap-3">
@@ -130,7 +130,7 @@ export default function Rooms() {
             return (
               <div
                 key={room.id}
-                className="rounded-2xl border border-white/8 bg-abyss overflow-hidden shadow-sm"
+                className="rounded-2xl border border-gray-100 bg-white overflow-hidden shadow-md"
               >
                 <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]">
                   {/* Room photo */}
@@ -143,7 +143,7 @@ export default function Rooms() {
                       sizes="(max-width: 768px) 100vw, 340px"
                     />
                     {room.badge && (
-                      <span className="absolute top-3 left-3 bg-odyssey-blue text-white text-[10px] font-bold tracking-wide px-3 py-1 rounded-full z-10">
+                      <span className="absolute top-3 left-3 bg-po-yellow text-po-ink text-[10px] font-bold tracking-wide px-3 py-1 rounded-full z-10">
                         {room.badge}
                       </span>
                     )}
@@ -155,7 +155,7 @@ export default function Rooms() {
                   </div>
 
                   {/* Room details */}
-                  <div className="flex flex-col gap-0 divide-y divide-white/8">
+                  <div className="flex flex-col gap-0 divide-y divide-gray-100">
                     {/* Main info */}
                     <div className="p-5 flex flex-col gap-3">
                       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -204,7 +204,7 @@ export default function Rooms() {
                         {room.amenities.map((a) => (
                           <span
                             key={a}
-                            className="flex items-center gap-1 text-[11px] bg-white/5 border border-white/10 text-sky-tint px-2.5 py-1 rounded-full"
+                            className="flex items-center gap-1 text-[11px] bg-po-cream border border-gray-200 text-gray-600 px-2.5 py-1 rounded-full"
                           >
                             {amenityIcons[a] ?? <Wifi size={12} />}
                             {a}
@@ -218,7 +218,7 @@ export default function Rooms() {
                       {tierBadges.map(({ minNights, discount }) => (
                         <span
                           key={minNights}
-                          className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-palm/10 border-palm/25 text-palm"
+                          className="flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full border bg-green-50 border-green-200 text-green-700"
                         >
                           <Sparkles size={10} />
                           {minNights}+ nights: <strong>{discount!.badge}</strong>
@@ -242,7 +242,7 @@ export default function Rooms() {
 
                       <Link
                         href={bookHref}
-                        className="flex items-center gap-2 bg-odyssey-blue hover:bg-azure-deep text-white text-sm font-semibold px-6 py-2.5 rounded-full transition-colors"
+                        className="flex items-center gap-2 bg-po-pink hover:bg-po-pink-dark text-white text-sm font-bold px-6 py-2.5 rounded-full transition-colors"
                       >
                         {labels.rooms.bookCta}
                       </Link>
@@ -258,11 +258,11 @@ export default function Rooms() {
                           Tap <strong className="text-ice">&quot;Book This Cabin&quot;</strong> to open WhatsApp — tell us your dates and number of beds and we&apos;ll confirm within a few hours.
                         </p>
                         <div className="grid grid-cols-2 gap-3 mt-1 text-xs">
-                          <div className="p-3 rounded-lg bg-white/3 border border-white/6">
+                          <div className="p-3 rounded-lg bg-po-cream border border-gray-100">
                             <p className="text-odyssey-blue font-semibold">Check-in</p>
                             <p>11:00 AM</p>
                           </div>
-                          <div className="p-3 rounded-lg bg-white/3 border border-white/6">
+                          <div className="p-3 rounded-lg bg-po-cream border border-gray-100">
                             <p className="text-odyssey-blue font-semibold">Check-out</p>
                             <p>10:00 AM</p>
                           </div>
@@ -277,13 +277,13 @@ export default function Rooms() {
         </div>
 
         {/* Pricing tiers summary */}
-        <div className="mt-8 rounded-2xl border border-white/8 bg-abyss overflow-hidden shadow-sm">
-          <div className="px-5 py-4 border-b border-white/8 flex items-center gap-2">
+        <div className="mt-8 rounded-2xl border border-gray-100 bg-white overflow-hidden shadow-md">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
             <Tag size={15} className="text-odyssey-blue" />
             <span className="text-sm font-semibold text-ice">Pricing & Discounts</span>
             <span className="ml-auto text-xs text-sky-tint">Per night drops every added night</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-white/8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
             {/* Per bed */}
             <div className="p-5 flex flex-col gap-1">
               <p className="text-xs text-sky-tint uppercase tracking-wider">1 Night</p>
@@ -292,10 +292,10 @@ export default function Rooms() {
             </div>
             {/* 7 nights */}
             <div className="p-5 flex flex-col gap-1">
-              <p className="text-xs text-green-400 uppercase tracking-wider flex items-center gap-1">
+              <p className="text-xs text-green-600 uppercase tracking-wider flex items-center gap-1">
                 <Sparkles size={10} /> 7 Nights
               </p>
-              <p className="text-2xl font-display font-bold text-green-400">
+              <p className="text-2xl font-display font-bold text-green-600">
                 ₹{fmt(effectiveNightly(7, livePricing.config, summaryBaseRate))}
                 <span className="text-sm font-normal text-sky-tint ml-1">
                   ~{getDiscount(7, livePricing.config)?.pct ?? 0}% off
@@ -317,7 +317,7 @@ export default function Rooms() {
               <p className="text-xs text-sky-tint">per bed / night</p>
             </div>
             {/* Monthly */}
-            <div className="p-5 flex flex-col gap-1 bg-odyssey-blue/5">
+            <div className="p-5 flex flex-col gap-1 bg-po-pink/5">
               <p className="text-xs text-mascot-glow uppercase tracking-wider flex items-center gap-1">
                 <Sparkles size={10} /> 27+ Nights
               </p>
@@ -333,7 +333,7 @@ export default function Rooms() {
         </div>
 
         {/* Group booking note */}
-        <div className="mt-6 p-5 rounded-2xl border border-odyssey-blue/20 bg-odyssey-blue/5 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
+        <div className="mt-6 p-5 rounded-2xl border border-odyssey-blue/20 bg-po-pink/5 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
           <div>
             <p className="text-sm font-semibold text-ice">Traveling with a group?</p>
             <p className="text-xs text-sky-tint mt-0.5">
@@ -344,7 +344,7 @@ export default function Rooms() {
             href={buildWhatsAppLink({ room: "Group booking — full room" })}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 text-xs font-semibold text-odyssey-blue hover:text-white border border-odyssey-blue/40 hover:bg-odyssey-blue px-5 py-2.5 rounded-full transition-all whitespace-nowrap"
+            className="shrink-0 text-xs font-semibold text-po-pink hover:text-white border border-po-pink/40 hover:bg-po-pink px-5 py-2.5 rounded-full transition-all whitespace-nowrap"
           >
             Block a Room for My Group
           </a>

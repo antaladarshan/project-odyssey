@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Menu, X, MessageCircle } from "lucide-react";
 import LogoPlaceholder from "./LogoPlaceholder";
 import { labels } from "@/config/labels";
 import { buildWhatsAppLink } from "@/lib/requestToBook";
@@ -13,19 +14,23 @@ const navLinks = [
   { label: "Story", href: "/about" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
+  { label: labels.nav.account, href: "/account" },
 ];
 
 export default function Nav() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setPastHero(window.scrollY > 60);
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close menu on route change / outside click
+  // Close menu on outside click
   useEffect(() => {
     if (!open) return;
     const close = () => setOpen(false);
@@ -33,64 +38,80 @@ export default function Nav() {
     return () => document.removeEventListener("click", close);
   }, [open]);
 
-  const bookHref = buildWhatsAppLink({});
+  const whatsappHref = buildWhatsAppLink({});
+
+  // Home: transparent, floating over the hero photo (white text) until the hero is
+  // scrolled past. Every other page has no photo behind the nav, so it is solid white.
+  const overHero = isHome && !pastHero && !open;
+  // Scrolled (or menu open): frosted glass instead of a flat white bar.
+  const glass =
+    "bg-white/60 backdrop-blur-xl backdrop-saturate-150 border-b border-white/50 shadow-[0_4px_30px_rgba(0,0,0,0.06)]";
+  const headerCls = isHome
+    ? `fixed top-0 inset-x-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300 ${
+        overHero ? "bg-transparent" : glass
+      }`
+    : `sticky top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300 ${
+        pastHero || open ? glass : "bg-white border-b border-gray-100"
+      }`;
+
+  const linkCls = overHero
+    ? "text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.45)] hover:text-po-yellow"
+    : "text-po-ink hover:text-po-pink";
 
   return (
     <>
-      <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-abyss/95 backdrop-blur-md border-b border-white/8 shadow-lg shadow-black/30"
-            : "bg-transparent"
-        }`}
-      >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
-          {/* Logo */}
-          <Link href="/" aria-label="Project Odyssey home" onClick={() => setOpen(false)}>
-            <LogoPlaceholder size="sm" />
+      <header className={headerCls}>
+        <nav className="mx-auto h-16 lg:h-[72px] px-4 sm:px-6 lg:px-[3.6vw] flex items-center justify-between gap-4">
+          <Link href="/" aria-label="Project Odyssey home" onClick={() => setOpen(false)} className="shrink-0">
+            <LogoPlaceholder size="nav" />
           </Link>
 
-          {/* Desktop links */}
-          <ul className="hidden md:flex items-center gap-6 text-sm font-medium text-sky-tint/80">
+          <ul className="hidden lg:flex items-center gap-6 text-[15px] font-semibold">
             {navLinks.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="hover:text-odyssey-blue hover:text-opacity-100 transition-colors">
+                <Link href={l.href} className={`transition-colors ${linkCls}`}>
                   {l.label}
                 </Link>
               </li>
             ))}
           </ul>
 
-          {/* Desktop actions */}
-          <div className="hidden md:flex items-center gap-2">
-            <Link href="/account" className="text-sm text-sky-tint hover:text-odyssey-blue transition-colors px-3 py-1.5">
-              {labels.nav.account}
-            </Link>
+          <div className="hidden lg:flex items-center gap-3 shrink-0">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-1.5 h-10 px-4 rounded-full text-sm font-semibold transition-colors ${
+                overHero
+                  ? "bg-white text-po-ink hover:bg-po-yellow"
+                  : "bg-white text-po-ink border border-gray-200 hover:border-po-pink hover:text-po-pink"
+              }`}
+            >
+              <MessageCircle size={15} /> WhatsApp
+            </a>
             <Link
               href="/property/project-odyssey-ahmedabad/"
-              className="bg-odyssey-blue hover:bg-azure-deep text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors"
+              className="inline-flex items-center h-10 px-5 rounded-full bg-po-pink hover:bg-po-pink-dark text-white text-sm font-bold transition-colors"
             >
               {labels.nav.book}
             </Link>
           </div>
 
-          {/* Mobile burger */}
-          <div className="md:hidden flex items-center gap-1">
+          <div className="lg:hidden flex items-center gap-1">
             <button
               onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
               aria-label="Toggle menu"
               aria-expanded={open}
-              className="p-2 text-sky-tint hover:text-odyssey-blue transition-colors"
+              className={`p-2 transition-colors ${overHero ? "text-white" : "text-po-ink"}`}
             >
-              {open ? <X size={22} /> : <Menu size={22} />}
+              {open ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </nav>
 
-        {/* Mobile dropdown */}
         {open && (
           <div
-            className="md:hidden bg-ink/98 backdrop-blur-md border-t border-white/8 px-5 py-5 flex flex-col gap-3"
+            className="lg:hidden border-t border-white/40 px-5 py-5 flex flex-col gap-3 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {navLinks.map((l) => (
@@ -98,21 +119,14 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 onClick={() => setOpen(false)}
-                className="text-sky-tint hover:text-odyssey-blue text-base font-medium transition-colors py-1"
+                className="text-po-ink hover:text-po-pink text-base font-semibold transition-colors py-1"
               >
                 {l.label}
               </Link>
             ))}
             <Link
-              href="/account"
-              onClick={() => setOpen(false)}
-              className="text-sky-tint hover:text-odyssey-blue text-base font-medium transition-colors py-1"
-            >
-              {labels.nav.account}
-            </Link>
-            <Link
               href="/property/project-odyssey-ahmedabad/"
-              className="mt-2 bg-odyssey-blue hover:bg-azure-deep text-white text-center font-semibold py-3.5 rounded-2xl transition-colors text-base block"
+              className="mt-2 bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-base block"
               onClick={() => setOpen(false)}
             >
               {labels.nav.book}
@@ -122,10 +136,10 @@ export default function Nav() {
       </header>
 
       {/* Mobile sticky bottom Book bar */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-abyss/95 backdrop-blur-md border-t border-white/8 safe-area-inset-bottom">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 safe-area-inset-bottom">
         <Link
           href="/property/project-odyssey-ahmedabad/"
-          className="flex items-center justify-center gap-2 w-full bg-odyssey-blue hover:bg-azure-deep text-white text-center font-semibold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
+          className="flex items-center justify-center gap-2 w-full bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
         >
           {labels.hero.cta}
         </Link>

@@ -3,44 +3,35 @@
 import Image from "next/image";
 
 interface LogoPlaceholderProps {
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "nav" | "md" | "lg";
+  /** Kept for backwards compatibility — the official logo already contains the wordmark. */
   showWordmark?: boolean;
   className?: string;
 }
 
-const sizes = {
-  sm: { mascot: 30, text: "text-sm" },
-  md: { mascot: 38, text: "text-base" },
-  lg: { mascot: 52, text: "text-xl" },
-};
+// Official logo (public/brand/logo.png) is 2702×536 — never recolor or redraw it.
+const RATIO = 2702 / 536;
+const heights = { xs: 30, sm: 36, nav: 32, md: 44, lg: 60 } as const;
 
 export default function LogoPlaceholder({
   size = "md",
-  showWordmark = true,
   className = "",
 }: LogoPlaceholderProps) {
-  const s = sizes[size];
+  const h = heights[size];
+  const w = Math.round(h * RATIO);
 
   return (
-    <div className={`flex items-center gap-2 select-none ${className}`}>
+    <div className={`select-none inline-flex ${className}`}>
       <Image
-        src="/brand/mascot.png"
+        src="/brand/logo.png"
         alt="Project Odyssey"
-        width={s.mascot}
-        height={s.mascot}
-        className="object-contain drop-shadow-[0_0_8px_rgba(88,176,224,0.45)]"
+        width={w}
+        height={h}
         priority
+        // nav logo is smaller on mobile (h-6) than desktop (h-8); other sizes are fixed.
+        className={`object-contain w-auto ${size === "nav" ? "h-6 lg:h-8" : ""}`}
+        style={size === "nav" ? undefined : { height: h }}
       />
-      {showWordmark && (
-        <div className="font-display font-bold leading-none">
-          <span className={`block tracking-[0.25em] font-light opacity-60 text-ice ${size === "sm" ? "text-[8px]" : "text-[10px]"}`}>
-            PROJECT
-          </span>
-          <span className={`block tracking-tight gradient-text ${s.text}`}>
-            ODYSSEY
-          </span>
-        </div>
-      )}
     </div>
   );
 }

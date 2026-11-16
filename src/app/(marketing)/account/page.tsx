@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function AccountPage() {
   return (
-    <div className="min-h-screen bg-abyss pt-24 pb-16 px-4 sm:px-6 flex items-center justify-center">
+    <div className="min-h-screen bg-abyss pt-10 pb-16 px-4 sm:px-6 flex items-center justify-center">
       <div className="w-full max-w-sm flex flex-col gap-6 text-center">
         <h1 className="font-display font-bold text-3xl text-ice">Traveler Account</h1>
         <p className="text-sky-tint text-sm">

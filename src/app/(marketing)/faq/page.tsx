@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function FaqPage() {
   return (
-    <div className="min-h-screen bg-abyss pt-20">
+    <div className="min-h-screen bg-abyss pt-4">
       <Faq />
     </div>
   );

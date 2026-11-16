@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function BlogIndexPage() {
   return (
-    <div className="min-h-screen bg-abyss pt-24 pb-24 px-4 sm:px-6">
+    <div className="min-h-screen bg-abyss pt-10 pb-24 px-4 sm:px-6">
       <div className="max-w-3xl mx-auto flex flex-col gap-10">
         <header className="flex flex-col gap-3">
           <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">Guides</p>

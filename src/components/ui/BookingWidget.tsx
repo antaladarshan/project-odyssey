@@ -102,17 +102,17 @@ export default function BookingWidget({ className = "" }: { className?: string }
   }
 
   const inputCls =
-    "w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-ice placeholder:text-sky-tint/40 focus:outline-none focus:border-odyssey-blue transition-colors";
+    "w-full bg-white border border-gray-200 rounded-xl px-3 py-2.5 text-sm text-po-ink placeholder:text-gray-400 focus:outline-none focus:border-po-pink transition-colors";
 
   return (
     <form
       onSubmit={handleBook}
-      className={`relative z-30 bg-ink/85 backdrop-blur-md border border-white/10 rounded-2xl p-4 flex flex-col gap-3 shadow-2xl ${className}`}
+      className={`relative z-30 bg-white text-po-ink border border-gray-100 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 shadow-[0_12px_40px_rgba(0,0,0,0.18)] ${className}`}
     >
       <div className="flex flex-col sm:flex-row gap-3 sm:items-end">
         {/* Date range trigger (popover rendered via portal below) */}
         <div className="flex-1 min-w-0">
-          <label className="flex items-center gap-1 text-xs text-sky-tint font-medium mb-1.5">
+          <label className="flex items-center gap-1 text-xs text-gray-500 font-semibold mb-1.5">
             <Calendar size={11} /> Check In — Check Out
           </label>
           <button
@@ -120,30 +120,30 @@ export default function BookingWidget({ className = "" }: { className?: string }
             type="button"
             onClick={() => setOpen((o) => !o)}
             className={`${inputCls} flex items-center justify-between text-left ${
-              open ? "border-odyssey-blue ring-1 ring-odyssey-blue/30" : ""
+              open ? "border-po-pink ring-1 ring-po-pink/30" : ""
             }`}
           >
             {checkIn && checkOut ? (
               <span className="truncate">
-                <span className="text-ice">{fmtDate(checkIn)}</span>
-                <span className="text-sky-tint/50 mx-2">→</span>
-                <span className="text-ice">{fmtDate(checkOut)}</span>
+                <span className="text-po-ink">{fmtDate(checkIn)}</span>
+                <span className="text-gray-400 mx-2">→</span>
+                <span className="text-po-ink">{fmtDate(checkOut)}</span>
               </span>
             ) : (
-              <span className="text-sky-tint/50">Add dates</span>
+              <span className="text-gray-400">Add dates</span>
             )}
-            <Calendar size={14} className="text-sky-tint shrink-0 ml-2" />
+            <Calendar size={14} className="text-gray-400 shrink-0 ml-2" />
           </button>
         </div>
 
         {/* Beds */}
         <div className="w-full sm:w-28 min-w-0">
-          <label className="flex items-center gap-1 text-xs text-sky-tint font-medium mb-1.5">
+          <label className="flex items-center gap-1 text-xs text-gray-500 font-semibold mb-1.5">
             <Users size={11} /> Beds
           </label>
           <select value={beds} onChange={(e) => setBeds(Number(e.target.value))} className={inputCls}>
             {[1, 2, 3, 4, 5, 6].map((n) => (
-              <option key={n} value={n} className="bg-ink">
+              <option key={n} value={n} className="bg-white">
                 {n} Bed{n > 1 ? "s" : ""}
               </option>
             ))}
@@ -153,7 +153,7 @@ export default function BookingWidget({ className = "" }: { className?: string }
         {/* CTA */}
         <button
           type="submit"
-          className="flex items-center justify-center gap-2 bg-odyssey-blue hover:bg-azure-deep text-white font-semibold px-5 py-2.5 rounded-xl transition-colors whitespace-nowrap h-[42px] w-full sm:w-auto"
+          className="flex items-center justify-center gap-2 bg-po-pink hover:bg-po-pink-dark text-white font-bold px-6 py-2.5 rounded-xl transition-colors whitespace-nowrap h-[42px] w-full sm:w-auto"
         >
           <span className="hidden sm:inline">{labels.booking.checkAvailability}</span>
           <span className="sm:hidden">Check Availability</span>
@@ -163,17 +163,17 @@ export default function BookingWidget({ className = "" }: { className?: string }
 
       {/* Live pricing preview */}
       {pricing && nights > 0 && (
-        <div className="border-t border-white/8 pt-3 flex items-center justify-between text-sm">
-          <span className="text-sky-tint text-xs">
+        <div className="border-t border-gray-100 pt-3 flex items-center justify-between text-sm">
+          <span className="text-gray-500 text-xs">
             ₹{fmt(perNight)} × {beds} bed{beds > 1 ? "s" : ""} × {nights} night{nights > 1 ? "s" : ""}
           </span>
           <div className="flex items-center gap-2">
             {pricing.discountInfo && (
-              <span className="text-[11px] font-bold text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">
                 {pricing.discountInfo.badge}
               </span>
             )}
-            <span className="font-bold text-ice">₹{fmt(pricing.total)}</span>
+            <span className="font-bold text-po-ink">₹{fmt(pricing.total)}</span>
           </div>
         </div>
       )}
@@ -181,10 +181,10 @@ export default function BookingWidget({ className = "" }: { className?: string }
       {/* Discount teasers */}
       {!pricing && (
         <div className="flex gap-2 flex-wrap">
-          <span className="flex items-center gap-1.5 text-[11px] bg-green-400/10 border border-green-400/20 text-green-400 px-2.5 py-1 rounded-full font-medium">
+          <span className="flex items-center gap-1.5 text-[11px] bg-green-50 border border-green-200 text-green-700 px-2.5 py-1 rounded-full font-medium">
             <Sparkles size={10} /> 7 nights → ₹{fmt(effectiveNightly(7, livePricing.config, baseRate))}/night
           </span>
-          <span className="flex items-center gap-1.5 text-[11px] bg-odyssey-blue/10 border border-odyssey-blue/20 text-odyssey-blue px-2.5 py-1 rounded-full font-medium">
+          <span className="flex items-center gap-1.5 text-[11px] bg-po-yellow/30 border border-po-yellow text-po-ink px-2.5 py-1 rounded-full font-medium">
             <Sparkles size={10} /> Monthly → ₹{fmt(effectiveNightly(27, livePricing.config, baseRate))}/night
           </span>
         </div>
@@ -209,8 +209,10 @@ export default function BookingWidget({ className = "" }: { className?: string }
                   maxHeight: "calc(100dvh - 16px)",
                   overflowY: "auto",
                   zIndex: 60,
+                  backgroundColor: "transparent",
                 }}
-                className="origin-top"
+                // Portaled to <body>, outside the layout's `marketing-light` scope — re-apply it.
+                className="origin-top marketing-light"
               >
                 <DateRangePicker
                   value={{ checkIn, checkOut }}

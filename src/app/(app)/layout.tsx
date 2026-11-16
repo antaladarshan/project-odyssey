@@ -1,6 +1,6 @@
+import LogoPlaceholder from "@/components/layout/LogoPlaceholder";
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import Image from "next/image";
 import { SignOutButton } from "@/components/SignOutButton";
 import { DesktopNavLinks, MobileNavLinks } from "@/components/NavLinks";
 import { getCurrentProfile } from "@/lib/auth/profile";
@@ -25,11 +25,8 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <div className="pms-scope flex min-h-full flex-1 flex-col md:flex-row">
       {/* Desktop left nav */}
       <aside className="hidden w-56 shrink-0 flex-col bg-surface-white p-4 shadow-[2px_0_12px_rgba(30,51,72,0.05)] md:flex">
-        <div className="flex items-center gap-2.5 px-2">
-          <div className="h-8 w-8 shrink-0 overflow-hidden rounded-lg shadow-soft">
-            <Image src="/mascot.png" alt="" width={64} height={64} className="h-full w-full object-cover" />
-          </div>
-          <span className="font-serif text-lg leading-tight text-ink-navy">Project Odyssey</span>
+        <div className="px-2">
+          <LogoPlaceholder size="xs" />
         </div>
         <DesktopNavLinks role={role} />
         <div className="mt-auto">

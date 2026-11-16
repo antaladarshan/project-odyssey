@@ -1,65 +1,34 @@
-import {
-  Wifi,
-  UtensilsCrossed,
-  Wind,
-  Droplets,
-  Lamp,
-  WashingMachine,
-  Coffee,
-  ShieldCheck,
-  MapPin,
-  Lock,
-} from "lucide-react";
-import { amenities } from "@/config/property";
-import { labels } from "@/config/labels";
-
-const iconComponents: Record<string, React.ReactNode> = {
-  Wifi: <Wifi size={28} strokeWidth={1.5} />,
-  UtensilsCrossed: <UtensilsCrossed size={28} strokeWidth={1.5} />,
-  Wind: <Wind size={28} strokeWidth={1.5} />,
-  Droplets: <Droplets size={28} strokeWidth={1.5} />,
-  Lamp: <Lamp size={28} strokeWidth={1.5} />,
-  Lock: <Lock size={28} strokeWidth={1.5} />,
-  WashingMachine: <WashingMachine size={28} strokeWidth={1.5} />,
-  Coffee: <Coffee size={28} strokeWidth={1.5} />,
-  ShieldCheck: <ShieldCheck size={28} strokeWidth={1.5} />,
-  MapPin: <MapPin size={28} strokeWidth={1.5} />,
-};
+import Image from "next/image";
+import { amenityGrid, amenityExtras } from "@/config/home";
+import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function Amenities() {
   return (
-    <section id="amenities" className="py-14 sm:py-24 px-4 sm:px-6 bg-abyss">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-14 flex flex-col gap-3">
-          <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">
-            Everything You Need
-          </p>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-ice">
-            {labels.amenities.heading}
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-          {amenities.map((a) => (
-            <div
-              key={a.label}
-              className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-ink border border-white/8 hover:border-odyssey-blue/40 hover:bg-white/3 transition-all text-center group"
-            >
-              <span className="text-odyssey-blue group-hover:text-mascot-glow transition-colors">
-                {iconComponents[a.icon] ?? <Wifi size={28} strokeWidth={1.5} />}
-              </span>
-              <span className="text-xs text-sky-tint font-medium leading-tight">{a.label}</span>
+    <section id="amenities" className="py-16 sm:py-24 px-4 sm:px-6 bg-white">
+      <div className="max-w-6xl mx-auto flex flex-col gap-12">
+        <SectionHeading
+          align="left"
+          title="Our Hostel Amenities & Facilities"
+          sub="Comfort matters, especially when you are away from home. Project Odyssey gives you all the essentials you'd expect from a modern, affordable stay, including:"
+        />
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-x-4 gap-y-10">
+          {amenityGrid.map((a) => (
+            <div key={a.label} className="flex flex-col items-center gap-3 text-center group">
+              <Image
+                src={a.image}
+                alt={a.label}
+                width={96}
+                height={96}
+                className="h-24 w-24 object-contain group-hover:-translate-y-1.5 transition-transform duration-300"
+              />
+              <span className="text-xs sm:text-sm text-gray-600 font-medium leading-tight">{a.label}</span>
             </div>
           ))}
         </div>
-
-        {/* Per-bed amenities callout */}
-        <div className="mt-8 p-5 rounded-2xl bg-odyssey-blue/5 border border-odyssey-blue/15 text-center">
-          <p className="text-sm text-sky-tint">
-            Every bed includes:{" "}
-            <span className="text-ice font-medium">Privacy curtain · Reading light · Power socket · Personal locker</span>
-          </p>
-        </div>
+        <p className="text-sm text-gray-600">
+          <span className="font-bold text-po-ink">Also included: </span>
+          {amenityExtras.join(" · ")}
+        </p>
       </div>
     </section>
   );

@@ -78,6 +78,20 @@ export const properties: PropertyConfig[] = [
     highlights: ["3-4 sharing rooms", "1-2 sharing rooms"],
   },
   {
+    id: "prop-v2",
+    slug: "project-odyssey-2-0",
+    name: "Project Odyssey 2.0",
+    city: "Ahmedabad",
+    // TODO: confirm location + details for Project Odyssey 2.0
+    description:
+      "Our next stay, built on everything guests love about Project Odyssey — privacy curtains, personal lockers and a real community. Full details coming soon.",
+    heroMedia: "/brand/mascot-rear.png",
+    lat: 23.0246061,
+    lng: 72.5233259,
+    comingSoon: true,
+    tag: "Coming Soon",
+  },
+  {
     id: "prop-02",
     slug: "project-odyssey-mumbai",
     name: "Project Odyssey",
@@ -288,6 +302,14 @@ export const faqs = [
   {
     q: "What is the cancellation policy?",
     a: "Free cancellation up to 72 hours before check-in. After that, the first night per bed is non-refundable. Reach us on WhatsApp for any special situations.",
+  },
+  {
+    q: "Can I host an event or workshop at Project Odyssey?",
+    a: "Possibly — our common area suits small meetups and workshops. Message us on WhatsApp with your idea, expected group size and date, and we will let you know.",
+  },
+  {
+    q: "Can I partner with Project Odyssey?",
+    a: "If you have a property in Gujarat and want to run it the Odyssey way, get in touch through the Partner with Us page and we will talk it through.",
   },
   {
     q: "Is it safe for solo travelers?",

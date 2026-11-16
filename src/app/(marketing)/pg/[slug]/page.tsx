@@ -48,7 +48,7 @@ export default async function LandingPage({ params }: Props) {
   ];
 
   return (
-    <div className="min-h-screen bg-abyss pt-24 pb-24 px-4 sm:px-6">
+    <div className="min-h-screen bg-abyss pt-10 pb-24 px-4 sm:px-6">
       {schemas.map((s, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }} />
       ))}

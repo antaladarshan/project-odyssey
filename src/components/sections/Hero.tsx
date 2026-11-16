@@ -1,127 +1,53 @@
-"use client";
-
-import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
 import BookingWidget from "@/components/ui/BookingWidget";
-import { labels } from "@/config/labels";
-import { supportsWebGL, prefersReducedMotion } from "@/lib/capabilities";
 
-const HeroCanvas = lazy(() => import("@/components/three/HeroCanvas"));
-
+// Layout copied from the reference hero: nav floats transparently over the photo,
+// stickers sit at ~27% of the hero height (left pink pair, right yellow pair),
+// two-line condensed headline centred, search card overlapping the bottom edge.
 export default function Hero() {
-  const mascotRef = useRef<HTMLDivElement>(null);
-  const [canUse3D, setCanUse3D] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    if (!prefersReducedMotion()) setCanUse3D(supportsWebGL());
-  }, []);
-
-  // Pointer parallax on mascot
-  useEffect(() => {
-    if (!mounted || prefersReducedMotion()) return;
-    const el = mascotRef.current;
-    if (!el) return;
-    const onMove = (e: MouseEvent) => {
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight / 2;
-      const dx = ((e.clientX - cx) / cx) * 10;
-      const dy = ((e.clientY - cy) / cy) * 6;
-      el.style.transform = `translate(${dx}px, ${dy}px)`;
-    };
-    const onLeave = () => { el.style.transform = ""; };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    window.addEventListener("mouseleave", onLeave);
-    return () => {
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseleave", onLeave);
-    };
-  }, [mounted]);
-
   return (
-    <section
-      id="hero"
-      className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-abyss"
-    >
-      {/* R3F 3D backdrop */}
-      {canUse3D && (
-        <Suspense fallback={null}>
-          <HeroCanvas />
-        </Suspense>
-      )}
+    <section id="hero" className="relative">
+      <div className="relative h-[78svh] min-h-[600px] overflow-hidden bg-po-ink">
+        <Image
+          src="/gallery/room-2a.webp"
+          alt="Bunk beds with privacy curtains at Project Odyssey, Ahmedabad"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        {/* light scrim: just enough for the white nav + headline to read */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/10 to-black/20" />
 
-      {/* Static star field fallback */}
-      {!canUse3D && (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-odyssey-blue/8 rounded-full blur-[100px]" />
-          {Array.from({ length: 40 }, (_, i) => (
-            <div key={i} className="absolute w-px h-px bg-sky-tint/40 rounded-full"
-              style={{ top: `${(i * 37 + 13) % 100}%`, left: `${(i * 61 + 7) % 100}%`, opacity: 0.2 + ((i * 0.15) % 0.6), transform: `scale(${1 + (i % 3)})` }} />
-          ))}
-        </div>
-      )}
-
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-abyss/30 via-transparent to-abyss/80 pointer-events-none z-10" />
-
-      <div className="relative z-20 w-full max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center text-center gap-6 sm:gap-8 pt-20 sm:pt-24 pb-28 sm:pb-32">
-
-        {/* Mascot */}
-        <div
-          ref={mascotRef}
-          className="transition-transform duration-200 ease-out animate-[float_4s_ease-in-out_infinite]"
-          style={{ willChange: "transform" }}
-        >
-          <Image
-            src="/brand/mascot.png"
-            alt="Project Odyssey backpacker mascot"
-            width={180}
-            height={180}
-            className="object-contain select-none drop-shadow-[0_0_32px_rgba(88,176,224,0.5)]"
-            sizes="(max-width: 640px) 140px, 180px"
-            priority
-          />
+        {/* Left stickers */}
+        <div className="absolute left-[1%] top-[24%] sm:top-[27%] z-10 flex flex-col items-start text-[clamp(0.85rem,1.5vw,1.85rem)]">
+          <span className="sticker sticker-float -rotate-[4deg]">More than just a bed</span>
+          <span className="sticker sticker-float ml-[8%] -mt-1 -rotate-[1deg]" style={{ animationDelay: "0.6s" }}>It&apos;s an experience</span>
         </div>
 
-        {/* Eyebrow */}
-        <p className="text-[10px] sm:text-xs tracking-[0.3em] font-medium text-odyssey-blue uppercase">
-          {labels.hero.sub}
-        </p>
+        {/* Right stickers */}
+        <div className="absolute right-[3%] lg:right-[8%] top-[24%] sm:top-[28%] z-10 flex flex-col items-end text-[clamp(0.85rem,1.5vw,1.85rem)]">
+          <span className="sticker sticker-yellow sticker-float" style={{ animationDelay: "1.2s" }}>Near ISRO SAC</span>
+          <span className="sticker sticker-yellow sticker-float -mt-1 -rotate-[4deg]" style={{ animationDelay: "1.8s" }}>From ₹700 / night</span>
+        </div>
 
-        {/* Heading */}
-        <h1 className="font-display font-extrabold text-4xl sm:text-6xl md:text-7xl lg:text-8xl leading-[0.95] text-ice">
-          Begin Your{" "}
-          <span className="gradient-text">Odyssey</span>
-        </h1>
-
-        {/* Sub-headline */}
-        <p className="text-base sm:text-xl text-sky-tint max-w-sm sm:max-w-xl leading-relaxed px-2">
-          A backpacker hostel in Ahmedabad — bunk beds with privacy curtains, personal lockers.
-          Book direct. No OTA markup.
-        </p>
-
-        {/* Booking widget */}
-        <BookingWidget className="w-full max-w-2xl mt-1" />
-
-        {/* Scroll cue */}
-        <a
-          href="#intro"
-          aria-label="Scroll down"
-          className="flex flex-col items-center gap-1.5 text-xs text-sky-tint/50 hover:text-odyssey-blue transition-colors mt-2 animate-bounce"
-        >
-          <span className="tracking-widest uppercase text-[0.6rem] hidden sm:block">{labels.hero.scrollCue}</span>
-          <ChevronDown size={16} />
-        </a>
+        {/* Headline */}
+        <div className="absolute inset-x-0 top-[44%] sm:top-[40%] -translate-y-1/2 z-10 text-center px-4">
+          <h1
+            className="font-condensed uppercase text-white text-[clamp(2.75rem,4.2vw,5rem)] leading-[0.95] tracking-wide"
+            style={{ textShadow: "3px 3px 0 #f43f5e" }}
+          >
+            Gen Z stays here,
+            <br />
+            so does the fun!
+          </h1>
+        </div>
       </div>
 
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-12px); }
-        }
-      `}</style>
+      {/* Search card overlapping the hero's bottom edge */}
+      <div className="relative z-20 -mt-24 px-4 pb-4">
+        <BookingWidget className="w-full max-w-5xl mx-auto" />
+      </div>
     </section>
   );
 }

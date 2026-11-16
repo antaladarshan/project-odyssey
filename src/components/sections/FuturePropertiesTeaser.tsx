@@ -1,48 +1,32 @@
-import { Compass } from "lucide-react";
-import { labels } from "@/config/labels";
-
-const futureDestinations = [
-  { city: "Goa", status: "Coming Soon" },
-  { city: "Rishikesh", status: "Coming Soon" },
-  { city: "Manali", status: "On the Map" },
-];
+import Link from "next/link";
+import { properties } from "@/config/property";
+import SectionHeading from "@/components/ui/SectionHeading";
 
 export default function FuturePropertiesTeaser() {
-  return (
-    <section className="py-12 sm:py-20 px-4 sm:px-6 bg-ink">
-      <div className="max-w-4xl mx-auto text-center flex flex-col items-center gap-8">
-        <div className="p-3 rounded-full bg-azure-core/10 border border-azure-core/20">
-          <Compass size={24} className="text-odyssey-blue" />
-        </div>
-        <div className="flex flex-col gap-3">
-          <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">
-            Next Destinations
-          </p>
-          <h2 className="font-display font-bold text-2xl sm:text-3xl md:text-4xl text-ice">
-            {labels.futureProperties.heading}
-          </h2>
-          <p className="text-sky-tint text-base max-w-md mx-auto">
-            {labels.futureProperties.sub}
-          </p>
-        </div>
+  const upcoming = properties.filter((p) => p.comingSoon);
 
-        {/* Destination pills */}
-        <div className="flex flex-wrap justify-center gap-3 mt-2">
-          {futureDestinations.map((d) => (
-            <div
-              key={d.city}
-              className="flex items-center gap-2 bg-white/3 border border-white/8 rounded-full px-5 py-2.5"
+  return (
+    <section className="py-16 sm:py-20 px-4 sm:px-6 bg-white">
+      <div className="max-w-5xl mx-auto flex flex-col gap-10">
+        <SectionHeading script="More stays" title="Coming Soon" sub="The Odyssey map keeps growing." />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {upcoming.map((p) => (
+            <Link
+              key={p.id}
+              href="/properties/"
+              className="group rounded-3xl bg-po-cream p-6 flex flex-col gap-2 hover:shadow-lg hover:-translate-y-1 transition-all"
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-odyssey-blue animate-pulse" />
-              <span className="text-sm font-medium text-sky-tint">{d.city}</span>
-              <span className="text-[10px] text-sky-tint/40">{d.status}</span>
-            </div>
+              <span className="self-start text-[11px] font-bold bg-po-yellow text-po-ink px-2.5 py-1 rounded-full">
+                {p.tag ?? "Coming Soon"}
+              </span>
+              <h3 className="font-display font-extrabold text-xl text-po-ink mt-2">
+                {p.name === "Project Odyssey" ? `Odyssey ${p.city}` : p.name}
+              </h3>
+              <p className="text-sm text-gray-600 line-clamp-3">{p.description}</p>
+              <span className="mt-2 text-sm font-bold text-po-pink group-hover:underline">Learn more →</span>
+            </Link>
           ))}
         </div>
-
-        <p className="text-xs text-sky-tint/40 mt-2">
-          Bookmark projectodyssey.in — the map grows.
-        </p>
       </div>
     </section>
   );
