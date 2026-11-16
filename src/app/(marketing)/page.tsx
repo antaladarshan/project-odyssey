@@ -9,6 +9,10 @@ import Reviews from "@/components/sections/Reviews";
 import ReturningGuest from "@/components/sections/ReturningGuest";
 import FuturePropertiesTeaser from "@/components/sections/FuturePropertiesTeaser";
 import Faq from "@/components/sections/Faq";
+import WhyUs from "@/components/sections/WhyUs";
+import LongStays from "@/components/sections/LongStays";
+import GroupCta from "@/components/sections/GroupCta";
+import TripPicker from "@/components/sections/TripPicker";
 
 export const metadata: Metadata = {
   title: { absolute: "PG & Hostel in Satellite, Ahmedabad (Near ISRO) | Project Odyssey" },
@@ -23,13 +27,17 @@ export default function HomePage() {
       <Hero />
       <Intro />
       <Rooms />
+      <WhyUs />
       <Amenities />
       <Gallery />
-      <PortsOfCall />
       <Reviews />
-      <ReturningGuest />
+      <LongStays />
+      <PortsOfCall />
+      <GroupCta />
       <FuturePropertiesTeaser />
       <Faq />
+      <TripPicker />
+      <ReturningGuest />
     </>
   );
 }

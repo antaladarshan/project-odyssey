@@ -32,9 +32,9 @@ export default function Hero() {
             className="font-condensed uppercase text-white text-5xl sm:text-7xl md:text-8xl leading-[0.95] tracking-wide"
             style={{ textShadow: "3px 3px 0 #f43f5e" }}
           >
-            Your Odyssey starts
+            Gen Z stays here,
             <br />
-            in Ahmedabad
+            so does the fun!
           </h1>
           <p className="mt-5 max-w-xl text-white/90 text-sm sm:text-lg">
             Backpacker bunks with privacy curtains &amp; personal lockers — book direct, no OTA markup.

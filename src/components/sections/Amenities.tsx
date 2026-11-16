@@ -1,63 +1,47 @@
 import {
-  Wifi,
-  UtensilsCrossed,
-  Wind,
-  Droplets,
-  Lamp,
-  WashingMachine,
-  Coffee,
-  ShieldCheck,
-  MapPin,
-  Lock,
+  Wifi, UtensilsCrossed, Wind, Droplets, Lamp, WashingMachine, Coffee, ShieldCheck, MapPin, Lock,
 } from "lucide-react";
 import { amenities } from "@/config/property";
-import { labels } from "@/config/labels";
+import SectionHeading from "@/components/ui/SectionHeading";
 
 const iconComponents: Record<string, React.ReactNode> = {
-  Wifi: <Wifi size={28} strokeWidth={1.5} />,
-  UtensilsCrossed: <UtensilsCrossed size={28} strokeWidth={1.5} />,
-  Wind: <Wind size={28} strokeWidth={1.5} />,
-  Droplets: <Droplets size={28} strokeWidth={1.5} />,
-  Lamp: <Lamp size={28} strokeWidth={1.5} />,
-  Lock: <Lock size={28} strokeWidth={1.5} />,
-  WashingMachine: <WashingMachine size={28} strokeWidth={1.5} />,
-  Coffee: <Coffee size={28} strokeWidth={1.5} />,
-  ShieldCheck: <ShieldCheck size={28} strokeWidth={1.5} />,
-  MapPin: <MapPin size={28} strokeWidth={1.5} />,
+  Wifi: <Wifi size={30} strokeWidth={1.5} />,
+  UtensilsCrossed: <UtensilsCrossed size={30} strokeWidth={1.5} />,
+  Wind: <Wind size={30} strokeWidth={1.5} />,
+  Droplets: <Droplets size={30} strokeWidth={1.5} />,
+  Lamp: <Lamp size={30} strokeWidth={1.5} />,
+  Lock: <Lock size={30} strokeWidth={1.5} />,
+  WashingMachine: <WashingMachine size={30} strokeWidth={1.5} />,
+  Coffee: <Coffee size={30} strokeWidth={1.5} />,
+  ShieldCheck: <ShieldCheck size={30} strokeWidth={1.5} />,
+  MapPin: <MapPin size={30} strokeWidth={1.5} />,
 };
 
 export default function Amenities() {
   return (
-    <section id="amenities" className="py-14 sm:py-24 px-4 sm:px-6 bg-abyss">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-14 flex flex-col gap-3">
-          <p className="text-xs tracking-[0.3em] uppercase text-odyssey-blue font-semibold">
-            Everything You Need
-          </p>
-          <h2 className="font-display font-bold text-3xl sm:text-4xl text-ice">
-            {labels.amenities.heading}
-          </h2>
-        </div>
+    <section id="amenities" className="py-16 sm:py-24 px-4 sm:px-6 bg-white">
+      <div className="max-w-5xl mx-auto flex flex-col gap-12">
+        <SectionHeading
+          script="Our"
+          title="Amenities & Facilities"
+          sub="Comfort matters when you're away from home. Here's everything included."
+        />
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-x-4 gap-y-8">
           {amenities.map((a) => (
-            <div
-              key={a.label}
-              className="flex flex-col items-center gap-3 p-5 rounded-2xl bg-ink border border-white/8 hover:border-odyssey-blue/40 hover:bg-white/3 transition-all text-center group"
-            >
-              <span className="text-odyssey-blue group-hover:text-mascot-glow transition-colors">
-                {iconComponents[a.icon] ?? <Wifi size={28} strokeWidth={1.5} />}
+            <div key={a.label} className="flex flex-col items-center gap-3 text-center group">
+              <span className="grid place-items-center w-16 h-16 rounded-full bg-po-cream text-po-pink group-hover:bg-po-pink group-hover:text-white group-hover:-translate-y-1 transition-all">
+                {iconComponents[a.icon] ?? <Wifi size={30} strokeWidth={1.5} />}
               </span>
-              <span className="text-xs text-sky-tint font-medium leading-tight">{a.label}</span>
+              <span className="text-xs sm:text-sm text-po-ink font-semibold leading-tight">{a.label}</span>
             </div>
           ))}
         </div>
 
-        {/* Per-bed amenities callout */}
-        <div className="mt-8 p-5 rounded-2xl bg-odyssey-blue/5 border border-odyssey-blue/15 text-center">
-          <p className="text-sm text-sky-tint">
+        <div className="p-5 rounded-2xl bg-po-yellow/25 text-center">
+          <p className="text-sm text-po-ink">
             Every bed includes:{" "}
-            <span className="text-ice font-medium">Privacy curtain · Reading light · Power socket · Personal locker</span>
+            <span className="font-bold">Privacy curtain · Reading light · Power socket · Personal locker</span>
           </p>
         </div>
       </div>
