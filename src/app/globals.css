@@ -222,16 +222,17 @@ body {
 /* Tilted sticker label with hard offset shadow */
 .sticker {
   display: inline-block;
-  padding: 0.35rem 0.9rem;
-  font-family: var(--font-display), sans-serif;
-  font-weight: 700;
+  padding: 0.5em 1.1em;
+  font-family: var(--font-nunito), var(--font-display), sans-serif;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
   color: #fff;
   background: var(--color-po-pink);
   box-shadow: 4px 4px 0 var(--color-po-yellow);
-  transform: rotate(-3deg);
 }
 .sticker-yellow {
-  color: var(--color-po-ink);
+  color: var(--color-po-pink);
   background: var(--color-po-yellow);
   box-shadow: 4px 4px 0 var(--color-po-pink);
 }

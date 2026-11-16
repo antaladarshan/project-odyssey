@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Bricolage_Grotesque, Newsreader, IBM_Plex_Mono, Bebas_Neue, Caveat } from "next/font/google";
+import { Inter, Bricolage_Grotesque, Newsreader, IBM_Plex_Mono, Bebas_Neue, Caveat, Nunito } from "next/font/google";
 import { siteConfig } from "@/config/site";
 import { lodgingSchema } from "@/lib/schema";
 import "./globals.css";
@@ -35,6 +35,13 @@ const bebas = Bebas_Neue({
   variable: "--font-bebas",
   display: "swap",
   weight: "400",
+});
+
+const nunito = Nunito({
+  subsets: ["latin"],
+  variable: "--font-nunito",
+  display: "swap",
+  weight: ["700", "800"],
 });
 
 const caveat = Caveat({
@@ -83,7 +90,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${bricolage.variable} ${newsreader.variable} ${ibmPlexMono.variable} ${bebas.variable} ${caveat.variable} h-full scroll-smooth`}
+      className={`${inter.variable} ${bricolage.variable} ${newsreader.variable} ${ibmPlexMono.variable} ${bebas.variable} ${caveat.variable} ${nunito.variable} h-full scroll-smooth`}
     >
       <head>
         <script

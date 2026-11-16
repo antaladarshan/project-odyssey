@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X, MessageCircle } from "lucide-react";
 import LogoPlaceholder from "./LogoPlaceholder";
 import { labels } from "@/config/labels";
@@ -13,14 +14,17 @@ const navLinks = [
   { label: "Story", href: "/about" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },
+  { label: labels.nav.account, href: "/account" },
 ];
 
 export default function Nav() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => setPastHero(window.scrollY > window.innerHeight * 0.6);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -36,63 +40,73 @@ export default function Nav() {
 
   const whatsappHref = buildWhatsAppLink({});
 
+  // Home: transparent, floating over the hero photo (white text) until the hero is
+  // scrolled past. Every other page has no photo behind the nav, so it is solid white.
+  const overHero = isHome && !pastHero && !open;
+  const headerCls = isHome
+    ? `fixed top-0 inset-x-0 z-50 transition-[background-color,box-shadow] duration-300 ${
+        overHero ? "bg-transparent" : "bg-white shadow-md shadow-black/10"
+      }`
+    : "sticky top-0 z-50 bg-white border-b border-gray-100";
+
+  const linkCls = overHero
+    ? "text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.45)] hover:text-po-yellow"
+    : "text-po-ink hover:text-po-pink";
+
   return (
     <>
-      <header
-        className={`sticky top-0 z-50 bg-white transition-shadow duration-300 ${
-          scrolled ? "shadow-md shadow-black/10" : "border-b border-gray-100"
-        }`}
-      >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
-          <Link href="/" aria-label="Project Odyssey home" onClick={() => setOpen(false)}>
-            <LogoPlaceholder size="sm" />
+      <header className={headerCls}>
+        <nav className="mx-auto h-20 lg:h-24 px-4 sm:px-6 lg:px-[3.6vw] flex items-center justify-between gap-4">
+          <Link href="/" aria-label="Project Odyssey home" onClick={() => setOpen(false)} className="shrink-0">
+            <LogoPlaceholder size="nav" />
           </Link>
 
-          <ul className="hidden md:flex items-center gap-7 text-sm font-semibold text-po-ink">
+          <ul className="hidden lg:flex items-center gap-8 text-[17px] font-semibold">
             {navLinks.map((l) => (
               <li key={l.href}>
-                <Link href={l.href} className="hover:text-po-pink transition-colors">
+                <Link href={l.href} className={`transition-colors ${linkCls}`}>
                   {l.label}
                 </Link>
               </li>
             ))}
           </ul>
 
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-4 shrink-0">
             <a
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-po-ink border border-gray-200 hover:border-po-pink hover:text-po-pink px-4 py-2 rounded-full transition-colors"
+              className={`inline-flex items-center gap-2 h-14 px-6 rounded-full text-base font-semibold transition-colors ${
+                overHero
+                  ? "bg-white text-po-ink hover:bg-po-yellow"
+                  : "bg-white text-po-ink border border-gray-200 hover:border-po-pink hover:text-po-pink"
+              }`}
             >
-              <MessageCircle size={15} /> WhatsApp
+              <MessageCircle size={18} /> WhatsApp
             </a>
-            <Link href="/account" className="text-sm font-semibold text-po-ink hover:text-po-pink transition-colors px-3 py-2">
-              {labels.nav.account}
-            </Link>
             <Link
               href="/property/project-odyssey-ahmedabad/"
-              className="bg-po-pink hover:bg-po-pink-dark text-white text-sm font-bold px-6 py-2.5 rounded-full transition-colors"
+              className="inline-flex items-center h-14 px-7 rounded-full bg-po-pink hover:bg-po-pink-dark text-white text-base font-bold transition-colors"
             >
               {labels.nav.book}
             </Link>
           </div>
 
-          <div className="md:hidden flex items-center gap-1">
+          <div className="lg:hidden flex items-center gap-1">
             <button
               onClick={(e) => { e.stopPropagation(); setOpen(!open); }}
               aria-label="Toggle menu"
               aria-expanded={open}
-              className="p-2 text-po-ink hover:text-po-pink transition-colors"
+              className={`p-2 transition-colors ${overHero ? "text-white" : "text-po-ink"}`}
             >
-              {open ? <X size={22} /> : <Menu size={22} />}
+              {open ? <X size={26} /> : <Menu size={26} />}
             </button>
           </div>
         </nav>
 
         {open && (
           <div
-            className="md:hidden bg-white border-t border-gray-100 px-5 py-5 flex flex-col gap-3 shadow-lg"
+            className="lg:hidden bg-white border-t border-gray-100 px-5 py-5 flex flex-col gap-3 shadow-lg"
             onClick={(e) => e.stopPropagation()}
           >
             {navLinks.map((l) => (
@@ -106,13 +120,6 @@ export default function Nav() {
               </Link>
             ))}
             <Link
-              href="/account"
-              onClick={() => setOpen(false)}
-              className="text-po-ink hover:text-po-pink text-base font-semibold transition-colors py-1"
-            >
-              {labels.nav.account}
-            </Link>
-            <Link
               href="/property/project-odyssey-ahmedabad/"
               className="mt-2 bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-base block"
               onClick={() => setOpen(false)}
@@ -124,7 +131,7 @@ export default function Nav() {
       </header>
 
       {/* Mobile sticky bottom Book bar */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 safe-area-inset-bottom">
+      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 safe-area-inset-bottom">
         <Link
           href="/property/project-odyssey-ahmedabad/"
           className="flex items-center justify-center gap-2 w-full bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
