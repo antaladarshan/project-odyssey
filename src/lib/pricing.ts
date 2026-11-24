@@ -315,8 +315,71 @@ export const WORKATION_MIN_NIGHTS = DEFAULT_CONFIG.workationMinNights;
 export const WORKATION_PCT = DEFAULT_CONFIG.workationPct * 100;
 export const GST_PCT = 0;
 
+// ── Hourly-changing monthly discount ─────────────────────────────────────────
+// The website's monthly (27+ night) discount % is re-drawn every IST hour so
+// the headline 30-night, 1-bed price AFTER the WORKATION coupon lands between
+// ₹8,100 and ₹12,000 and is never a round figure. It's a pure function of the
+// hour, so every visitor and every WhatsApp quote in that hour agrees.
+// Weekly and extended tiers are untouched.
+
+export const HOURLY_MONTHLY = { minTotal: 8100, maxTotal: 12000, nights: 30 } as const;
+
+const HOUR_MS = 3_600_000;
+const IST_OFFSET_MS = 19_800_000; // UTC+5:30
+
+/** Whole IST hours since the epoch: changes exactly on each IST :00. */
+export function istHourKey(now: Date = new Date()): number {
+  return Math.floor((now.getTime() + IST_OFFSET_MS) / HOUR_MS);
+}
+
+/** Milliseconds until the next IST hour boundary. */
+export function msUntilNextIstHour(now: Date = new Date()): number {
+  return HOUR_MS - ((now.getTime() + IST_OFFSET_MS) % HOUR_MS);
+}
+
+function mulberry32(seed: number): () => number {
+  let a = seed | 0;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/** Target 30-night total (after coupon) for an IST hour: in range, last digit 2–8. */
+export function hourlyMonthlyTarget(hourKey: number): number {
+  const rand = mulberry32(Math.imul(hourKey, 2654435761) ^ 0x9e3779b9);
+  rand(); // discard the first draw so neighbouring hours decorrelate
+  const { minTotal, maxTotal } = HOURLY_MONTHLY;
+  let target = Math.round(minTotal + rand() * (maxTotal - minTotal));
+  // Keep clear of round figures even after ±₹1 rounding differences.
+  if ([0, 1, 9].includes(target % 10)) target += 3;
+  if (target > maxTotal) target = maxTotal - 3;
+  return target;
+}
+
+/**
+ * Monthly discount fraction (e.g. 0.4712) that makes a 30-night stay at
+ * `baseRate` cost the hour's target total after the WORKATION coupon.
+ */
+export function hourlyMonthlyDiscountPct(
+  baseRate: number,
+  hourKey: number = istHourKey(),
+  workationPct: number = DEFAULT_CONFIG.workationPct,
+): number {
+  const target = hourlyMonthlyTarget(hourKey);
+  const pct = 1 - target / (HOURLY_MONTHLY.nights * baseRate * (1 - workationPct));
+  return Math.min(0.95, Math.max(0, pct));
+}
+
+/** ODYSSEY_PRICING_CONFIG with the current hour's monthly discount applied. */
+export function odysseyDefaults(hourKey: number = istHourKey()): Partial<PricingConfig> {
+  return { ...ODYSSEY_PRICING_CONFIG, monthlyDiscountPct: hourlyMonthlyDiscountPct(RACK_NIGHTLY, hourKey) };
+}
+
 export function getDiscount(nights: number, config?: Partial<PricingConfig>) {
-  const losPct = losDiscountPctFor(nights, { ...DEFAULT_CONFIG, ...ODYSSEY_PRICING_CONFIG, ...config });
+  const losPct = losDiscountPctFor(nights, { ...DEFAULT_CONFIG, ...odysseyDefaults(), ...config });
   if (losPct === 0) return null;
   const pct = Math.round(losPct * 100);
   return { pct, label: `${nights}-night stay`, badge: `${pct}% off` };
@@ -328,7 +391,7 @@ export function effectiveNightly(
   baseRate: number = RACK_NIGHTLY,
 ): number {
   if (nights <= 0) return baseRate;
-  const cfg = { ...DEFAULT_CONFIG, ...ODYSSEY_PRICING_CONFIG, ...config };
+  const cfg = { ...DEFAULT_CONFIG, ...odysseyDefaults(), ...config };
   const losPct = losDiscountPctFor(nights, cfg);
   return Math.round(baseRate * (1 - losPct));
 }
@@ -341,7 +404,7 @@ export function calcBedTotal(
   checkIn?: string,
 ) {
   if (nights <= 0) return { base: 0, discount: 0, total: 0, perNight: nightlyRate, discountInfo: null };
-  const cfg = { ...ODYSSEY_PRICING_CONFIG, ...config };
+  const cfg = { ...odysseyDefaults(), ...config };
   const { perNight, pctOff, roomCharges } = calcRoomPricing(nights, beds, nightlyRate, cfg, checkIn);
   const base = nightlyRate * nights * beds;
   const discount = base - roomCharges;

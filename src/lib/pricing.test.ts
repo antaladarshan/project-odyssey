@@ -13,6 +13,12 @@ import {
   calcBilling,
   nightsBetween,
   DEFAULT_CONFIG,
+  ODYSSEY_PRICING_CONFIG,
+  HOURLY_MONTHLY,
+  hourlyMonthlyDiscountPct,
+  hourlyMonthlyTarget,
+  istHourKey,
+  msUntilNextIstHour,
   type PricingConfig,
 } from "./pricing";
 
@@ -331,5 +337,58 @@ describe("Project Odyssey config — ₹700 base, 29% weekly, 43% extended (14+)
     const b = calcBilling({ roomCharges: r.total, nights: 30, workation: true, config: odysseyCfg });
     expect(b.totalPrice).toBe(9103); // 10,710 − 1,607
     expect(b.totalPrice).toBeGreaterThanOrEqual(9000);
+  });
+});
+
+// ── Hourly monthly discount ───────────────────────────────────────────────────
+
+describe("hourly monthly discount", () => {
+  const startHour = istHourKey(new Date("2026-11-24T00:00:00+05:30"));
+  const hours = Array.from({ length: 500 }, (_, i) => startHour + i);
+
+  it("30-night, 1-bed total after WORKATION is within ₹8,100–₹12,000 and never round (calcPricing path)", () => {
+    for (const h of hours) {
+      const pct = hourlyMonthlyDiscountPct(700, h);
+      const r = calcPricing(30, 700, {
+        workation: true,
+        config: { ...ODYSSEY_PRICING_CONFIG, monthlyDiscountPct: pct },
+      });
+      expect(r.total).toBeGreaterThanOrEqual(HOURLY_MONTHLY.minTotal);
+      expect(r.total).toBeLessThanOrEqual(HOURLY_MONTHLY.maxTotal);
+      expect(r.total % 10).not.toBe(0);
+    }
+  });
+
+  it("same holds through the calcRoomPricing + calcBilling path", () => {
+    for (const h of hours) {
+      const pct = hourlyMonthlyDiscountPct(700, h);
+      const config = { ...ODYSSEY_PRICING_CONFIG, monthlyDiscountPct: pct };
+      const { roomCharges } = calcRoomPricing(30, 1, 700, config);
+      const b = calcBilling({ roomCharges, nights: 30, workation: true, config });
+      expect(b.totalPrice).toBeGreaterThanOrEqual(HOURLY_MONTHLY.minTotal - 1);
+      expect(b.totalPrice).toBeLessThanOrEqual(HOURLY_MONTHLY.maxTotal + 1);
+      expect(b.totalPrice % 10).not.toBe(0);
+    }
+  });
+
+  it("is deterministic within an hour and varies across hours", () => {
+    expect(hourlyMonthlyDiscountPct(700, startHour)).toBe(hourlyMonthlyDiscountPct(700, startHour));
+    const distinct = new Set(hours.map((h) => hourlyMonthlyTarget(h)));
+    expect(distinct.size).toBeGreaterThan(300);
+  });
+
+  it("changes on the IST hour boundary, not the UTC one", () => {
+    const before = istHourKey(new Date("2026-11-24T10:29:59Z")); // 15:59:59 IST
+    const after = istHourKey(new Date("2026-11-24T10:30:00Z")); // 16:00:00 IST
+    expect(after).toBe(before + 1);
+    expect(msUntilNextIstHour(new Date("2026-11-24T10:29:59Z"))).toBe(1000);
+  });
+
+  it("leaves weekly and extended tiers untouched", () => {
+    const base = ODYSSEY_PRICING_CONFIG;
+    const pct = hourlyMonthlyDiscountPct(700, startHour);
+    const config = { ...base, monthlyDiscountPct: pct };
+    expect(calcPricing(7, 700, { config }).losDiscountPct).toBe(0.29);
+    expect(calcPricing(14, 700, { config }).losDiscountPct).toBe(0.43);
   });
 });

@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ODYSSEY_PRICING_CONFIG, RACK_NIGHTLY, type PricingConfig } from "./pricing";
+import {
+  ODYSSEY_PRICING_CONFIG,
+  RACK_NIGHTLY,
+  hourlyMonthlyDiscountPct,
+  istHourKey,
+  msUntilNextIstHour,
+  type PricingConfig,
+} from "./pricing";
 import type { PricingConfigResponse } from "@/app/api/pricing/route";
 
 // Night-count thresholds are fixed application constants, not host-editable
@@ -40,6 +47,20 @@ export function resolveBasePrice(
 export function useLivePricing(): LivePricing {
   const [data, setData] = useState<PricingConfigResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  // IST hour driving the monthly discount. null until mounted, so the
+  // server-rendered HTML and first client render agree (no hydration mismatch).
+  const [hourKey, setHourKey] = useState<number | null>(null);
+
+  // Re-draw the monthly discount on every IST hour boundary, even if the page stays open.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      setHourKey(istHourKey());
+      timer = setTimeout(tick, msUntilNextIstHour() + 50);
+    };
+    tick();
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -62,6 +83,14 @@ export function useLivePricing(): LivePricing {
         }
       : ODYSSEY_PRICING_CONFIG),
   };
+
+  // Hourly monthly discount: keeps the 30-night, 1-bed price (after WORKATION)
+  // within ₹8,100–₹12,000. Anchored to the cheapest live bed price.
+  if (hourKey !== null) {
+    const bases = Object.values(data?.basePriceByRoomTypeId ?? {}).filter((n) => n > 0);
+    const anchor = bases.length ? Math.min(...bases) : RACK_NIGHTLY;
+    config.monthlyDiscountPct = hourlyMonthlyDiscountPct(anchor, hourKey);
+  }
 
   return {
     basePriceByRoomTypeId: data?.basePriceByRoomTypeId ?? {},

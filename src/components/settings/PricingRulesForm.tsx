@@ -83,7 +83,7 @@ export function PricingRulesForm({
           min="0"
           max="100"
           step="1"
-          label="Monthly (27+ night) discount %"
+          label="Monthly (27+ night) discount % — the public website sets this automatically every hour (₹8,100–₹12,000 per bed for 30 nights after WORKATION)"
           defaultValue={monthlyDiscountPct}
           onChange={onPctChange("monthly")}
         />
