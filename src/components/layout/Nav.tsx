@@ -21,6 +21,8 @@ const navLinks = [
 export default function Nav() {
   const pathname = usePathname();
   const isHome = pathname === "/";
+  // The Studio page has its own booking flow, so the stay "Set Sail" buttons are hidden there.
+  const isStudio = pathname.startsWith("/studio");
   const [open, setOpen] = useState(false);
   const [pastHero, setPastHero] = useState(false);
 
@@ -90,12 +92,14 @@ export default function Nav() {
             >
               <MessageCircle size={15} /> WhatsApp
             </a>
-            <Link
-              href="/property/project-odyssey-ahmedabad/"
-              className="inline-flex items-center h-10 px-5 rounded-full bg-po-pink hover:bg-po-pink-dark text-white text-sm font-bold transition-colors"
-            >
-              {labels.nav.book}
-            </Link>
+            {!isStudio && (
+              <Link
+                href="/property/project-odyssey-ahmedabad/"
+                className="inline-flex items-center h-10 px-5 rounded-full bg-po-pink hover:bg-po-pink-dark text-white text-sm font-bold transition-colors"
+              >
+                {labels.nav.book}
+              </Link>
+            )}
           </div>
 
           <div className="lg:hidden flex items-center gap-1">
@@ -125,26 +129,30 @@ export default function Nav() {
                 {l.label}
               </Link>
             ))}
-            <Link
-              href="/property/project-odyssey-ahmedabad/"
-              className="mt-2 bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-base block"
-              onClick={() => setOpen(false)}
-            >
-              {labels.nav.book}
-            </Link>
+            {!isStudio && (
+              <Link
+                href="/property/project-odyssey-ahmedabad/"
+                className="mt-2 bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-base block"
+                onClick={() => setOpen(false)}
+              >
+                {labels.nav.book}
+              </Link>
+            )}
           </div>
         )}
       </header>
 
       {/* Mobile sticky bottom Book bar */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 safe-area-inset-bottom">
-        <Link
-          href="/property/project-odyssey-ahmedabad/"
-          className="flex items-center justify-center gap-2 w-full bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
-        >
-          {labels.hero.cta}
-        </Link>
-      </div>
+      {!isStudio && (
+        <div className="lg:hidden fixed bottom-0 inset-x-0 z-40 p-3 bg-white/95 backdrop-blur-md border-t border-gray-200 safe-area-inset-bottom">
+          <Link
+            href="/property/project-odyssey-ahmedabad/"
+            className="flex items-center justify-center gap-2 w-full bg-po-pink hover:bg-po-pink-dark text-white text-center font-bold py-3.5 rounded-2xl transition-colors text-[15px] tracking-wide"
+          >
+            {labels.hero.cta}
+          </Link>
+        </div>
+      )}
     </>
   );
 }
