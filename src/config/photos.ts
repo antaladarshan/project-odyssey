@@ -5,7 +5,7 @@
 
 export const photo = {
   // Living area
-  superhost: "/photos/superhost-living.webp", // living room with the Airbnb Superhost badge (home hero)
+  superhost: "/photos/superhost-lounge.webp", // lounge with the Airbnb Superhost badge (home hero)
   livingSofa: "/photos/living-sofa.webp",
   livingBeanbags: "/photos/living-sofa-beanbags.webp",
   livingEvening: "/photos/living-evening.webp",
