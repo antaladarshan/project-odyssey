@@ -11,6 +11,7 @@ import { buildWhatsAppLink } from "@/lib/requestToBook";
 const navLinks = [
   { label: "Properties", href: "/properties/" },
   { label: "The Stay", href: "/property/project-odyssey-ahmedabad/" },
+  { label: "Studio", href: "/studio/" },
   { label: "Story", href: "/about" },
   { label: "FAQ", href: "/faq" },
   { label: "Contact", href: "/contact" },

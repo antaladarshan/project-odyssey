@@ -68,6 +68,32 @@ export function buildWhatsAppLink(req: BookingRequest): string {
   return `https://wa.me/${number}?text=${text}`;
 }
 
+export interface StudioRequest {
+  date?: string; // YYYY-MM-DD
+  time?: string;
+  hours?: number;
+  type?: string;
+  people?: number;
+  total?: number;
+  advance?: number;
+}
+
+export function buildStudioWhatsAppLink(req: StudioRequest): string {
+  const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+  const lines: string[] = ["Hi! I'd like to book Project Odyssey, Ahmedabad for a shoot / podcast."];
+  if (req.type) lines.push(`Type: ${req.type}`);
+  if (req.date) lines.push(`Date: ${formatDate(req.date)}`);
+  if (req.time) lines.push(`Start time: ${req.time}`);
+  if (req.hours) lines.push(`Duration: ${req.hours} hour${req.hours > 1 ? "s" : ""}`);
+  if (req.people) lines.push(`People: ${req.people}`);
+  if (req.total) lines.push(`Estimated total: ${inr(req.total)}`);
+  if (req.advance) lines.push(`50% advance: ${inr(req.advance)}`);
+  lines.push("Please confirm availability. Thank you!");
+
+  const number = siteConfig.whatsapp.replace(/[^0-9]/g, "");
+  return `https://wa.me/${number}?text=${encodeURIComponent(lines.join("\n"))}`;
+}
+
 export function buildMailtoLink(req: BookingRequest): string {
   const subject = encodeURIComponent("Booking Request — Project Odyssey, Ahmedabad");
   const nights = req.checkIn && req.checkOut ? nightsBetween(req.checkIn, req.checkOut) : 0;
